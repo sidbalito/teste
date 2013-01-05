@@ -1,11 +1,10 @@
-import javax.microedition.midlet.MIDlet;
-import javax.microedition.midlet.MIDletStateChangeException;
-//Midlet's User interface API
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
+import javax.microedition.midlet.MIDlet;
+//Midlet's User interface API
 //import javax.microedition.midlet.*;
 
 public class Teste extends MIDlet
@@ -22,7 +21,8 @@ public class Teste extends MIDlet
 
   	exitCommand = new Command("Exit", Command.EXIT, 1);
 
-     	helloForm = new Form("Device Specs");
+     	helloForm = new Form("Device " +
+     			"Specs");
 
   	// Use System.getProperty() to query device configurations
   	helloForm.append("Platform : "
