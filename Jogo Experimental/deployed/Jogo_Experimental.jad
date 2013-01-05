@@ -1,0 +1,7 @@
+MIDlet-Jar-Size: 24111
+MIDlet-Jar-URL: Jogo_Experimental.jar
+MIDlet-Name: Jogo Experimental Midlet Suite
+MIDlet-Vendor: Midlet Suite Vendor
+MIDlet-Version: 1.0.9
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.0
