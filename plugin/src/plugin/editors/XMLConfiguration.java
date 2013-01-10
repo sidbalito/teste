@@ -9,6 +9,7 @@ import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.NumberRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
+import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -17,8 +18,12 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
 public class XMLConfiguration extends SourceViewerConfiguration {
-	private static final TextAttribute WORD = new TextAttribute(new Color(Display.getCurrent(), IXMLColorConstants.WORD));
-	private static final TextAttribute NUMBER = new TextAttribute(new Color(Display.getCurrent(), IXMLColorConstants.NUMBER));
+	private static final Display CURR_DISP = Display.getCurrent();
+	private static final TextAttribute WORD = new TextAttribute(new Color(CURR_DISP, IXMLColorConstants.WORD));
+	private static final TextAttribute NUMBER = new TextAttribute(new Color(CURR_DISP, IXMLColorConstants.NUMBER));
+	private static final TextAttribute MACRO = new TextAttribute(new Color(CURR_DISP, IXMLColorConstants.MACRO));
+	private static final TextAttribute VAR = new TextAttribute(new Color(CURR_DISP, IXMLColorConstants.MACRO));
+	private static final TextAttribute STRING = new TextAttribute(new Color(CURR_DISP, IXMLColorConstants.STRING));
 	private XMLDoubleClickStrategy doubleClickStrategy;
 	private XMLTagScanner tagScanner;
 	private XMLScanner scanner;
@@ -80,7 +85,16 @@ public class XMLConfiguration extends SourceViewerConfiguration {
 		
 		RuleBasedScanner word = new RuleBasedScanner();
 		
-		word.setRules(new IRule[]{new NumberRule(new Token(NUMBER)), new WordRule(new WordDetector(), new Token(WORD), true) });
+		word.setRules(new IRule[]{ 
+				//new WordRule(new WordDetector(), new Token(WORD), true),
+				// Add rule for double quotes
+				new SingleLineRule("\"", "\"", new Token(STRING), '\\'),
+				// Add a rule for single quotes
+				new SingleLineRule("'", "'", new Token(STRING), '\\'),
+				
+				new WordRule(new NumberDetector(), new Token(NUMBER), true), 
+				new WordRule(new MacroDetector(), new Token(MACRO), true), 
+				new WordRule(new VarDetector(), new Token(VAR), true) });
 		dr = new DefaultDamagerRepairer(word );
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);

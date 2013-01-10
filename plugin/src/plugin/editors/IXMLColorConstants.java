@@ -10,4 +10,5 @@ public interface IXMLColorConstants {
 	RGB TAG = new RGB(0, 0, 128);
 	RGB WORD = new RGB(0, 0, 255);
 	RGB NUMBER = new RGB(255, 0, 0);
+	RGB MACRO = new RGB(255, 0, 255);
 }
