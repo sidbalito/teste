@@ -11,6 +11,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Image;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
@@ -42,11 +43,13 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 		//tela = new List("Contatos", List.IMPLICIT);
 		tela.setCommandListener(this);
 		tela.addCommand(cmdSair);
-		tela.addCommand(cmdEditar);
+		//tela.addCommand(cmdEditar);
 //		tela.addCommand(cmdExportar);
 /*		ListaGrafica grafica = new ListaGrafica(this);
 		grafica.append("Teste1");
 		grafica.append("Teste2");//*/
+		tela.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_LARGE));
+		tela.setColor(0x80, 0xFFFFFF);
 		display.setCurrent(tela);
 	}
 
@@ -54,7 +57,7 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 		try {
 			int i = 0;
 			while (true) {
-				icones.addElement(Image.createImage("/"+i+".jpg"));
+				icones.addElement(Image.createImage("/"+i+".png"));
 				i++;
 			}
 		} catch (IOException e) {
@@ -110,6 +113,7 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	}
 	
 	private String getFieldValue(PIMItem item, int field){
+		if(item == null) return null;
 		return item.getString(field, 0);
 	}
 	
@@ -142,12 +146,6 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 				e.printStackTrace();
 			}
 		}else if(command == cmdEditar){
-			String numero = getFieldValue(itemAt(tela.getSelected()), Contact.TEL);
-			String nome = getFieldValue(itemAt(tela.getSelected()), Contact.FORMATTED_NAME);
-
-			ImagePicker ip = new ImagePicker(this, Operadora.getOperadora(numero), icones);
-			ip.setTexts(nome, numero);
-			display.setCurrent(ip);
 		}else if(command == cmdOperadoras){
 			ListaGrafica operadoras = new ListaGrafica(this);
 			String item;
@@ -162,11 +160,20 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	}
 
 	private PIMItem itemAt(int selectedIndex) {
+		if(listas.size()<=selectedIndex) return null;
 		return (PIMItem) listas.elementAt(selectedIndex);	
 	}
 
 	public void keyPressed(int keyCode) {
-			if(keyCode == -5|keyCode == -10)
+			if(keyCode == -5){
+				String numero = getFieldValue(itemAt(tela.getSelected()), Contact.TEL);
+			String nome = getFieldValue(itemAt(tela.getSelected()), Contact.FORMATTED_NAME);
+
+			ImagePicker ip = new ImagePicker(this, Operadora.getOperadora(numero), icones);
+			ip.setTexts(nome, numero);
+			display.setCurrent(ip);
+			
+			}else if(keyCode == -10)
 				try {
 					platformRequest("tel:"+getFieldValue(itemAt(tela.getSelected()), Contact.TEL));
 				} catch (ConnectionNotFoundException e) {
@@ -182,8 +189,8 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 		
 	}
 
-	public String getDetail() {
-		return getFieldValue(itemAt(tela.getSelected()), Contact.TEL);
+	public String getDetail(int index) {
+		return getFieldValue(itemAt(index), Contact.TEL);
 	}
 
 	public void setPicked(int selected) {
