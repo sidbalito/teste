@@ -65,7 +65,7 @@ public class ListaGrafica extends Canvas{
 				bottomIndex = itemIndex-1;
 				break;
 			}
-			g.drawImage((Image) icones.elementAt(i), graphicsWidth, y, Graphics.TOP|Graphics.RIGHT);
+			g.drawImage((Image) icones.elementAt(itemIndex), graphicsWidth, y, Graphics.TOP|Graphics.RIGHT);
 			if(itemIndex == selectedIndex) {
 				g.drawRect(0, y, graphicsWidth-2, itemHeight-1);
 				g.drawString(listaListener.getDetail(), 5, y+fontHeight, 0);
@@ -102,6 +102,10 @@ public class ListaGrafica extends Canvas{
 
 	public int size() {
 		return items.size();
+	}
+
+	public void setImage(int selected, Image image) {
+		icones.setElementAt(image, selected);
 	}
 }
 

@@ -23,12 +23,14 @@ import javax.microedition.pim.PIMList;
 import ListaGrafica;
 import ListaListener;
 
-public class Contatos extends MIDlet implements CommandListener, ListaListener{
+public class Contatos extends MIDlet implements CommandListener, ListaListener, PickerListener{
 
 	private PIM pim = PIM.getInstance();
 	private ListaGrafica tela = new ListaGrafica(this);
 	private Command cmdLigar = new Command("Ligar", Command.OK, 0);
 	private Command cmdSair = new Command("Sair", Command.EXIT, 0);
+	private Command cmdExportar = new Command("Exportar", Command.ITEM, 0);
+	private Command cmdEditar = new Command("Editar", Command.ITEM, 0);
 	private Command cmdOperadoras = new Command("Operadoras", Command.ITEM, 0);
 	private final Display display;
 	private Vector listas = new Vector();
@@ -40,7 +42,8 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener{
 		//tela = new List("Contatos", List.IMPLICIT);
 		tela.setCommandListener(this);
 		tela.addCommand(cmdSair);
-		tela.addCommand(cmdOperadoras);
+		tela.addCommand(cmdEditar);
+//		tela.addCommand(cmdExportar);
 /*		ListaGrafica grafica = new ListaGrafica(this);
 		grafica.append("Teste1");
 		grafica.append("Teste2");//*/
@@ -55,12 +58,10 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener{
 				i++;
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
 	protected void destroyApp(boolean arg0) throws MIDletStateChangeException {
-
 	}
 
 	protected void pauseApp() {
@@ -120,7 +121,33 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener{
 				e.printStackTrace();
 			}
 		else if(command == cmdSair){
-			notifyDestroyed();
+			new Thread(new Runnable(){
+				
+				public void run() {
+					try {
+						Operadora.exporta();
+						notifyDestroyed();
+				} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+			}).start();
+		}else if(command == cmdExportar){
+			try {
+				Operadora.exporta();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else if(command == cmdEditar){
+			String numero = getFieldValue(itemAt(tela.getSelected()), Contact.TEL);
+			String nome = getFieldValue(itemAt(tela.getSelected()), Contact.FORMATTED_NAME);
+
+			ImagePicker ip = new ImagePicker(this, Operadora.getOperadora(numero), icones);
+			ip.setTexts(nome, numero);
+			display.setCurrent(ip);
 		}else if(command == cmdOperadoras){
 			ListaGrafica operadoras = new ListaGrafica(this);
 			String item;
@@ -139,7 +166,7 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener{
 	}
 
 	public void keyPressed(int keyCode) {
-			if(keyCode == -5)
+			if(keyCode == -5|keyCode == -10)
 				try {
 					platformRequest("tel:"+getFieldValue(itemAt(tela.getSelected()), Contact.TEL));
 				} catch (ConnectionNotFoundException e) {
@@ -157,6 +184,13 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener{
 
 	public String getDetail() {
 		return getFieldValue(itemAt(tela.getSelected()), Contact.TEL);
+	}
+
+	public void setPicked(int selected) {
+		Operadora.setOperadora(getFieldValue(itemAt(tela.getSelected()), Contact.TEL), selected);
+		tela.setImage(tela.getSelected(), (Image)icones.elementAt(selected));
+		tela.getSelected();
+		display.setCurrent(tela);
 	}
 
 }
