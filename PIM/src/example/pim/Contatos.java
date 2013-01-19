@@ -35,6 +35,7 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	private final Display display;
 	private Vector listas = new Vector();
 	private Vector icones = new Vector();
+	private Vector logos = new Vector();
 	private int corTelaContatos = 0x800000;
 	private int corLetraContatos = 0xFFFFFF;
 
@@ -43,14 +44,20 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	}
 
 	private void loadIcons() {
+		int i = 0;
+		String pequeno, grande;
 		try {
-			int i = 0;
 			while (true) {
-				icones.addElement(Image.createImage("/"+i+".png"));
+				pequeno = "/"+i+".png";
+				grande = "/G"+i+".png";
+				System.out.println(pequeno +" e "+grande);
+				icones.addElement(Image.createImage(pequeno));
+				logos.addElement(Image.createImage(grande));
 				i++;
 			}
-		} catch (IOException e) {
-			System.out.println("Ultimo ícone");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -194,7 +201,7 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 				String numero = getFieldValue(itemAt(contatos.getSelected()), Contact.TEL);
 			String nome = getFieldValue(itemAt(contatos.getSelected()), Contact.FORMATTED_NAME);
 
-			ImagePicker ip = new ImagePicker(this, Operadora.getOperadora(numero), icones);
+			ImagePicker ip = new ImagePicker(this, Operadora.getOperadora(numero), logos);
 			ip.setTexts(nome, numero);
 			display.setCurrent(ip);
 			
