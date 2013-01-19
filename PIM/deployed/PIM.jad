@@ -1,8 +1,8 @@
 MIDlet-1: PIM,,example.pim.Contatos
-MIDlet-Jar-Size: 54926
+MIDlet-Jar-Size: 112597
 MIDlet-Jar-URL: PIM.jar
 MIDlet-Name: PIM Midlet Suite
 MIDlet-Vendor: Midlet Suite Vendor
-MIDlet-Version: 1.0.16
+MIDlet-Version: 1.0.20
 MicroEdition-Configuration: CLDC-1.1
 MicroEdition-Profile: MIDP-2.0

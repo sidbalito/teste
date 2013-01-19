@@ -21,7 +21,8 @@ public class ListaGrafica extends Canvas{
 	private int fBkColor = 0xFFFFFF;
 	private int fColor = 0;
 	private Font font;
-	private int detailColor = 0x8000;
+	private int detailColor = 0x008000;
+	private boolean ordered;
 		
 	public ListaGrafica(ListaListener listaListener){
 		this.listaListener = listaListener;
@@ -43,7 +44,8 @@ public class ListaGrafica extends Canvas{
 	}
 	
 	public String getString(int index){
-		return (String) items.elementAt(index);
+		if(items.size()>0) return (String) items.elementAt(index);
+		return ""; 
 	}
 
 	protected void paint(Graphics g) {
@@ -67,6 +69,7 @@ public class ListaGrafica extends Canvas{
 		g.setColor(fBkColor);
 		g.fillRect(0, 0, graphicsWidth, graphicsHeight);
 		g.setColor(fColor);
+		if(items.size()<=0)return;
 		int selctedY = 0 ;
 		int selItemIndex = 0;
 		for(int i = 0; i<items.size(); i++){
@@ -80,13 +83,15 @@ public class ListaGrafica extends Canvas{
 				selctedY = y;
 			}
 			g.drawString((String) items.elementAt(itemIndex), 2, y, 0);
-			g.drawImage((Image) icones.elementAt(itemIndex), graphicsWidth, y, Graphics.TOP|Graphics.RIGHT);
+			Image icone = (Image) icones.elementAt(selItemIndex);
+			if(icone != null) g.drawImage((Image) icones.elementAt(itemIndex), graphicsWidth, y, Graphics.TOP|Graphics.RIGHT);
 			y += itemHeight;
 		}
 		y = selctedY;
 		g.setColor(fBkColor|CLAREADOR);
 		g.fillRect(0, y, graphicsWidth-2, itemHeight-1);
 		String detail = listaListener.getDetail(selItemIndex);
+		g.setColor(fColor);
 		if(detail != ""){					
 			int y1 = y+(fontHeight>>2);
 			y1 +=((selectedIndex >= bottomIndex)? -fontHeight:fontHeight);
@@ -96,16 +101,47 @@ public class ListaGrafica extends Canvas{
 			g.drawRect(5, y1 , font.stringWidth(detail), fontHeight);
 			g.drawString(detail, 5, y1, 0);
 		}
-		g.drawString((String) items.elementAt(selItemIndex), 2, y, 0);
-		g.drawImage((Image) icones.elementAt(selItemIndex), graphicsWidth, y, Graphics.TOP|Graphics.RIGHT);
+		g.drawString((String) items.elementAt(selItemIndex), 2, y+(itemHeight>>1)-(fontHeight>>1), Graphics.TOP|Graphics.LEFT);
+		Image icone = (Image) icones.elementAt(selItemIndex);
+		if(icone != null) g.drawImage(icone, graphicsWidth, y, Graphics.TOP|Graphics.RIGHT);
 		
 	}
 
 	public void append(String s, Image icone) {
-		items.addElement(s);
-		icones.addElement(icone);
+		if(ordered){
+			int index = getInsertPos(s);
+			
+			items.insertElementAt(s, index);
+			icones.insertElementAt(icone, index);
+		} else {
+			items.addElement(s);
+			icones.addElement(icone);
+		}
 	}
 	
+	private int getInsertPos(String s) {
+		if(items.size() < 1) return 0;
+		int startAt = items.size()/2;
+		return getInsertPos(s, startAt);
+	}
+
+	private int getInsertPos(String s, int startAt) {
+		int nextPos = compare(s, (String) items.elementAt(startAt));
+		switch (nextPos) {
+		case 0: return startAt;
+		case 1: 
+			startAt += (items.size()-startAt)/2;
+		case -1:
+			startAt = startAt/2;
+		}
+		return getInsertPos(s, startAt);
+	}
+
+	private int compare(String s, String elementAt) {
+		int compare = s.compareTo(elementAt);
+		return compare/(compare & 0xEFFFFFFF);
+	}
+
 	public void setItems(Vector items){
 		this.items = items;
 	}
@@ -148,6 +184,14 @@ public class ListaGrafica extends Canvas{
 	
 	public void setFont(Font font){
 		this.font = font;
+	}
+
+	public boolean isOrdered() {
+		return ordered;
+	}
+
+	public void setOrdered(boolean ordered) {
+		this.ordered = ordered;
 	}
 }
 
