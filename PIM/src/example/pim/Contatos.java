@@ -33,7 +33,7 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	private Command cmdEditar = new Command("Editar", Command.ITEM, 0);
 	private Command cmdOperadoras = new Command("Operadoras", Command.ITEM, 0);
 	private final Display display;
-	private Vector listas = new Vector();
+	private final Vector listas = new Vector();
 	private Vector icones = new Vector();
 	private Vector logos = new Vector();
 	private int corTelaContatos = 0x800000;
@@ -50,14 +50,12 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 			while (true) {
 				pequeno = "/"+i+".png";
 				grande = "/G"+i+".png";
-				System.out.println(pequeno +" e "+grande);
 				icones.addElement(Image.createImage(pequeno));
 				logos.addElement(Image.createImage(grande));
 				i++;
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+			System.out.println("Ultimo ícone carregado.");
 		}
 	}
 
@@ -183,7 +181,6 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 			String item;
 			for(Enumeration items = Operadora.getNumeros(); items.hasMoreElements();){
 				item = (String)items.nextElement();
-				System.out.println(item);
 				int codOperadora = Operadora.getOperadora(item);
 				operadoras.append(item, (Image) icones.elementAt(codOperadora <icones.size()?codOperadora:0));
 			}
