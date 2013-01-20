@@ -72,14 +72,17 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	}
 	
 	private void inicializa() {
-		display.setCurrent(new Splash("Carregando..."));
 		loadIcons();
+		display.setCurrent(new Splash("Carregando...", logos));
+		/*
+		long ms = System.currentTimeMillis()+50000;
+		while(ms>System.currentTimeMillis());
+		//*/
 		contatos.setCommandListener(this);
 		contatos.addCommand(cmdSair);
 		contatos.addCommand(cmdChamar);
 		contatos.addCommand(cmdImportar);
 		contatos.addCommand(cmdExportar);
-		//contatos.setOrdered(true);
 		contatos.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_LARGE));
 		contatos.setColor(corTelaContatos , corLetraContatos );
 		try {
@@ -88,19 +91,12 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 			System.out.println("Erro ao carregar dados");
 		}
 		String[] nomesListas = pim.listPIMLists(PIM.CONTACT_LIST);
-//		Enumeration items;
-		//ListsMerger.setContatos(this, nomesListas.length);
 		Enumeration[] enums = new Enumeration[nomesListas.length];
 		try {
-			//while(items.hasMoreElements())System.out.println(getString(items.nextElement()));
-			//System.out.println(pim.openPIMList(PIM.CONTACT_LIST, pim.READ_ONLY, pim.listPIMLists(PIM.CONTACT_LIST)[0]).items().nextElement());//enums[0].hasMoreElements());
 			for(int i = 0; i<nomesListas.length; i++){
-				//new Thread(new ListsMerger(getContactList(nomesListas[i]))).start();
 				enums[i] = getContactList(nomesListas[i]).items();	
 			}
-//			while(enums[0].hasMoreElements())System.out.println(getString(enums[0].nextElement()));
 			mergeEnumerations(enums);
-			//contatos.repaint();
 		} catch (PIMException e) {
 			System.out.println("Erro ao abrir PIMList");
 		}
@@ -130,16 +126,13 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 		return (Image) icones.elementAt(index<icones.size()?index:0);
 	}
 	
-	
 	public void addNomeContato(String nome, Image icone){
 		contatos.append(nome, icone);
 	}
 	
 	private String getFieldValue(PIMItem item, int field){
 		if(item == null) return "";
-		//if(field == Contact.TEL) System.out.println("Tel "+item.countValues(field));//getString(field, 0));
 		if (item.countValues(field) == 0) return "";
-		//System.out.println("num: "+item.getString(field, 0));
 		return item.getString(field, 0);
 	}
 	
@@ -237,12 +230,9 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 		int i = 0;
 		int next = -1;
 		int candidate;
-//		int numCandidates = len==1?1:0;
 		int numEnums = len;
-//		int x = 1;
 		Object[] items = new Object[len];
 		while(true){
-			//System.out.println(i+": "+candidates[i]);
 			if(i<numEnums){
 				if(candidates[i] == null){
 					if(!enums[i].hasMoreElements()){
@@ -253,28 +243,20 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 					}
 					items[i] = enums[i].nextElement();
 					candidates[i] = getString(items[i]);
-//					numCandidates++;
 				}
 			}
 			candidate = i;
-			//System.out.println(enums[i].hasMoreElements());
 			next = compare(next, candidate, candidates);
-			//System.out.println(numCandidates);
 			i++;
 			
 			if( i >= len){
-				//add(candidates[next], (items[next]));
 				addContato(items[next]);
 				candidates[next] = null;
-//				numCandidates--;
 				next = -1;
 				i = 0;
-				//hasCandidates = false;
 			}
-			//System.out.println(isAllNull(candidates));
-		}//*/
+		}
 	}
-	
 
 	private boolean isAllNull(String[] candidates) {
 		for(int i = 0; i < candidates.length; i++) if(candidates[i] != null) return false;
@@ -289,7 +271,6 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 		}
 		if(candidates[candidate] == null) return next;
 		int compare = candidates[next].compareTo(candidates[candidate]);
-		//System.out.println(compare);
 		if(compare>0)return candidate;
 		return next;
 	}
