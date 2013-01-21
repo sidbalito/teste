@@ -19,19 +19,19 @@ import javax.microedition.pim.PIMException;
 import javax.microedition.pim.PIMItem;
 import javax.microedition.pim.PIMList;
 
-import ListaGrafica;
-import ListaListener;
+import comum.Alerta;
+import comum.graficos.*;
 
 public class Contatos extends MIDlet implements CommandListener, ListaListener, PickerListener{
 
 	private PIM pim = PIM.getInstance();
 	private ListaGrafica contatos = new ListaGrafica(this);
-	private Command cmdSair = new Command("Sair", Command.EXIT, 0);
-	private Command cmdChamar = new Command("Chamar", Command.ITEM, 0);
-	private Command cmdImportar = new Command("Importar", Command.ITEM, 0);
-	private Command cmdExportar = new Command("Exportar", Command.ITEM, 0);
-	private Command cmdEditar = new Command("Editar", Command.ITEM, 0);
-	private Command cmdOperadoras = new Command("Operadoras", Command.ITEM, 0);
+	private Command cmdSair = new Command("Sair", Command.ITEM, 2);
+	private Command cmdChamar = new Command("Chamar", Command.OK, 1);
+	private Command cmdImportar = new Command("Importar", Command.ITEM, 2);
+	private Command cmdExportar = new Command("Exportar", Command.ITEM, 2);
+	private Command cmdEditar = new Command("Editar", Command.ITEM, 2);
+	private Command cmdOperadoras = new Command("Operadoras", Command.ITEM, 2);
 	private final Display display;
 	private final Vector listas = new Vector();
 	private Vector icones = new Vector();
@@ -73,23 +73,25 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	
 	private void inicializa() {
 		loadIcons();
-		display.setCurrent(new Splash("Carregando...", logos));
+		Splash splash = new Splash("Carregando...", logos);
+		splash.setSubtext("Preparando aplicação...");
+		display.setCurrent(splash);
 		/*
-		long ms = System.currentTimeMillis()+50000;
+		long ms = System.currentTimeMillis()+2000;
 		while(ms>System.currentTimeMillis());
 		//*/
-		contatos.setCommandListener(this);
-		contatos.addCommand(cmdSair);
-		contatos.addCommand(cmdChamar);
-		contatos.addCommand(cmdImportar);
-		contatos.addCommand(cmdExportar);
-		contatos.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_LARGE));
-		contatos.setColor(corTelaContatos , corLetraContatos );
+		configuraContatos();
 		try {
 			Operadora.loadData();
 		} catch (Exception e) {
-			System.out.println("Erro ao carregar dados");
+			System.out.println(e.getClass());
+			showError("Erro ao carregar dados.\n"+e.getMessage()+"\n"+e.getClass());
 		}
+		splash.setSubtext("Lista de contatos...");
+		populateList();
+	}
+	
+	private void populateList(){
 		String[] nomesListas = pim.listPIMLists(PIM.CONTACT_LIST);
 		Enumeration[] enums = new Enumeration[nomesListas.length];
 		try {
@@ -98,7 +100,7 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 			}
 			mergeEnumerations(enums);
 		} catch (PIMException e) {
-			System.out.println("Erro ao abrir PIMList");
+			showError("Erro ao abrir PIMList.\n"+e.getMessage()+"\n"+e.getClass());
 		}
 	}
 
@@ -141,7 +143,7 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 			try {
 				platformRequest("tel:"+getFieldValue(itemAt(contatos.getSelected()), Contact.TEL));
 			} catch (Exception e) {
-				System.out.println("Erro ao efetuar chamada");;
+				showError("Erro ao efetuar chamada.\n"+e.getMessage()+"\n"+e.getClass());
 			}
 		else if(command == cmdSair){
 			new Thread(new Runnable(){
@@ -151,23 +153,36 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 						Operadora.storeData();
 						notifyDestroyed();
 				} catch (Exception e) {
-					System.out.println("Erro ao armazenar dados");
+					showError("Erro ao armazenar dados..\n"+e.getMessage()+"\n"+e.getClass());
 				}
 					
 				}
 			}).start();
 		}else if(command == cmdImportar){
-			try {
-				Operadora.importa();
-			} catch (Exception e) {
-				System.out.println("Erro ao importar");
-			}
+			contatos = new ListaGrafica(this);
+			display.setCurrent(new Splash("Carregando..."));
+			new Thread(new Runnable() {
+				public void run() {
+					try {
+						Operadora.importa();
+						configuraContatos();
+						display.setCurrent(contatos);
+					} catch (Exception e) {
+						showError("Erro ao importar.\n"+e.getMessage()+"\n"+e.getClass());
+					}						
+				}
+			}).start();
+
 		}else if(command == cmdExportar){
-			try {
-				Operadora.exporta();
-			} catch (IOException e) {
-				System.out.println("Erro ao exportar");
-			}
+			new Thread(new Runnable() {
+				public void run() {
+					try {
+						Operadora.exporta();
+					} catch (IOException e) {
+						showError("Erro ao exportar.\n"+e.getMessage()+"\n"+e.getClass());
+					}
+				}
+			}).start();
 		}else if(command == cmdEditar){
 		}else if(command == cmdOperadoras){
 			ListaGrafica operadoras = new ListaGrafica(this);
@@ -199,7 +214,7 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 				try {
 					platformRequest("tel:"+getFieldValue(itemAt(contatos.getSelected()), Contact.TEL));
 				} catch (ConnectionNotFoundException e) {
-					System.out.println("Erro ao efetuar chamada");
+					showError("Erro ao efetuar chamada.\n"+e.getMessage()+"\n"+e.getClass());
 				}	
 	}
 
@@ -279,5 +294,23 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 		return false;
 	}
 
+	private void showError(String text){
+		System.out.println("Erro: "+text);
+		display.setCurrent(new Alerta("Erro", text));
+		//*/
+		long ms = System.currentTimeMillis()+10000;
+		while(ms>System.currentTimeMillis());
+		//*/
+	}
+	
+	private void configuraContatos(){
+		contatos.setCommandListener(this);
+		contatos.addCommand(cmdSair);
+		contatos.addCommand(cmdChamar);/*
+		contatos.addCommand(cmdImportar);
+		contatos.addCommand(cmdExportar);//*/
+		contatos.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_LARGE));
+		contatos.setColor(corTelaContatos , corLetraContatos );
 
+	}
 }

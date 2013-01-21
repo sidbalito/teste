@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="lib" path="/Comum/src" sourcepath="/Comum/src"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Comum"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="res"/>
 	<classpathentry kind="con" path="J2MELIB"/>
