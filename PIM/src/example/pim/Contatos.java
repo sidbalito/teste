@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
@@ -20,6 +19,7 @@ import javax.microedition.pim.PIMItem;
 import javax.microedition.pim.PIMList;
 
 import comum.Alerta;
+import comum.KeyBoard;
 import comum.graficos.*;
 
 public class Contatos extends MIDlet implements CommandListener, ListaListener, PickerListener{
@@ -38,9 +38,14 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	private Vector logos = new Vector();
 	private int corTelaContatos = 0x800000;
 	private int corLetraContatos = 0xFFFFFF;
+	private int[] atalhos = new int[26];
+	private int repeat;
+	private int lastKey;
+	private Splash splash;
 
 	public Contatos() {
 		display = Display.getDisplay(this);
+		for(int i = 0; i < atalhos.length; i++)atalhos[i] = Integer.MAX_VALUE;
 	}
 
 	private void loadIcons() {
@@ -67,13 +72,22 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	}
 
 	protected void startApp() throws MIDletStateChangeException {
-		if(icones.size()<1)inicializa();
-		display.setCurrent(contatos);
+		try {
+			if(icones.size()<1)inicializa();
+			splash.setSubtext("Inicializado...");
+			/*
+			long ms = System.currentTimeMillis()+2000;
+			while(ms>System.currentTimeMillis());
+			//*/
+			display.setCurrent(contatos);		
+		} catch (Exception e) {
+			showError("Erro desconhecido: \n"+e.getMessage()+"\n"+e.getClass());
+		}
 	}
 	
 	private void inicializa() {
 		loadIcons();
-		Splash splash = new Splash("Carregando...", logos);
+		splash = new Splash("Carregando...", logos);
 		splash.setSubtext("Preparando aplicação...");
 		display.setCurrent(splash);
 		/*
@@ -130,8 +144,22 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	
 	public void addNomeContato(String nome, Image icone){
 		contatos.append(nome, icone);
+		if(nome.length()>0)	setAtalho(nome.charAt(0), contatos.size());
 	}
 	
+	private void setAtalho(char c, int pos) {
+		int index = Character.toUpperCase(c) - 'A';
+		if(atalhos[index] > pos)	atalhos[index] = pos;
+	}
+
+	private int getAtalho(char c) {
+		if(c < 'A' | c > 'z' | (c > 'Z' & c < 'a')) return contatos.getSelected();
+		int index = Character.toUpperCase(c) - 'A';
+		int pos = atalhos[index]-1;
+		if(pos > contatos.size()) return contatos.getSelected();
+		return pos;
+	}
+
 	private String getFieldValue(PIMItem item, int field){
 		if(item == null) return "";
 		if (item.countValues(field) == 0) return "";
@@ -202,24 +230,25 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	}
 
 	public void keyPressed(int keyCode) {
-			if(keyCode == -5){
-				String numero = getFieldValue(itemAt(contatos.getSelected()), Contact.TEL);
+		if(keyCode == KeyBoard.FIRE_KEY){
+			String numero = getFieldValue(itemAt(contatos.getSelected()), Contact.TEL);
 			String nome = getFieldValue(itemAt(contatos.getSelected()), Contact.FORMATTED_NAME);
-
 			ImagePicker ip = new ImagePicker(this, Operadora.getOperadora(numero), logos);
 			ip.setTexts(nome, numero);
 			display.setCurrent(ip);
-			
-			}else if(keyCode == -10)
-				try {
-					platformRequest("tel:"+getFieldValue(itemAt(contatos.getSelected()), Contact.TEL));
-				} catch (ConnectionNotFoundException e) {
-					showError("Erro ao efetuar chamada.\n"+e.getMessage()+"\n"+e.getClass());
-				}	
+		} else {	
+			if(lastKey != keyCode){
+				lastKey = keyCode;
+				repeat = 0;
+			} else repeat++;
+			char c = KeyBoard.getAlphaChar(keyCode, repeat, true);
+			if(c == -1) return;
+			contatos.setTopSelected(getAtalho(c));
+			contatos.repaint();
+		}
 	}
 
 	public void keyRepeated(int keyCode) {
-		
 	}
 
 	public void keyReleased(int keyCode) {
@@ -313,4 +342,5 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 		contatos.setColor(corTelaContatos , corLetraContatos );
 
 	}
+	
 }

@@ -8,6 +8,8 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
+import comum.KeyBoard;
+
 
 
 public class ListaGrafica extends Canvas{
@@ -150,11 +152,16 @@ public class ListaGrafica extends Canvas{
 
 	protected void keyPressed(int keyCode) {
 		int index = getSelected();
-		switch(getGameAction(keyCode)){
-		case UP: if(index > 0) setSelected(index-1); repaint(); break;
-		case DOWN: if(index < size()-1) setSelected(index+1); repaint(); break;
+		switch(keyCode){
+		case KeyBoard.UP_KEY: if(index > 0) setSelected(index-1); repaint(); break;
+		case KeyBoard.DOWN_KEY: if(index < size()-1) setSelected(index+1); repaint(); break;
 		default: if(listaListener != null) listaListener.keyPressed(keyCode);
 		}
+	}
+	
+	protected void keyRepeated(int keyCode) {
+		super.keyRepeated(keyCode);
+		keyPressed(keyCode);
 	}
 	public void setKeyReceiver(ListaListener keyListener){
 		this.listaListener = keyListener;
@@ -194,6 +201,11 @@ public class ListaGrafica extends Canvas{
 
 	public void setOrdered(boolean ordered) {
 		this.ordered = ordered;
+	}
+
+	public void setTopSelected(int index) {
+		topIndex = index;
+		setSelected(index);
 	}
 }
 

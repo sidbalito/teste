@@ -22,8 +22,7 @@ public class PIMItems extends MIDlet{
 	protected void pauseApp() {}
 
 	protected void startApp() throws MIDletStateChangeException {
-			System.out.println(toString(new Integer(1000)));
-			/*
+			//*
 		try {
 			pim = PIM.getInstance();
 			for(int i = PIM.CONTACT_LIST;i <= PIM.TODO_LIST;i++)
@@ -32,12 +31,12 @@ public class PIMItems extends MIDlet{
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}/*/
+		}//*/
 	}
 
 	private void lista(int listType, String[] lists) throws PIMException {
 		for(int i = 0; i < lists.length; i++){
-			System.out.println(lists[i]);
+			System.out.println("\n\n"+lists[i]+'\n');
 			PIMList pimlist = pim.openPIMList(listType, PIM.READ_ONLY, lists[i]);
 			suportedFields(pimlist);
 			listItems(pimlist.items());
