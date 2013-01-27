@@ -87,6 +87,7 @@ public class Operadora {
         long len = fc.fileSize();
         byte[] buff = new byte[(int) len];
 		fis.read(buff);
+		fromBytes(buff);
 		int campo = 0;
 		int codOperadora = 0; 
 		StringBuffer numero = new StringBuffer(); 
@@ -118,7 +119,7 @@ public class Operadora {
 		
 	}
 
-	private void fromBytes(byte[] buff){
+	private static void fromBytes(byte[] buff){
 		StringBuffer numero = new StringBuffer();
 		int codOperadora = 0, campo = 0;
 		for(int i = 0; i<buff.length;i++){

@@ -42,6 +42,7 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	private int repeat;
 	private int lastKey;
 	private Splash splash;
+	private boolean inicializado;
 
 	public Contatos() {
 		display = Display.getDisplay(this);
@@ -73,7 +74,8 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 
 	protected void startApp() throws MIDletStateChangeException {
 		try {
-			if(icones.size()<1)inicializa();
+			if(icones.size() <= 0)loadIcons();
+			if(!inicializado)inicializa();
 			splash.setSubtext("Inicializado...");
 			/*
 			long ms = System.currentTimeMillis()+2000;
@@ -86,7 +88,6 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	}
 	
 	private void inicializa() {
-		loadIcons();
 		splash = new Splash("Carregando...", logos);
 		splash.setSubtext("Preparando aplicação...");
 		display.setCurrent(splash);
@@ -103,6 +104,7 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 		}
 		splash.setSubtext("Lista de contatos...");
 		populateList();
+		inicializado = true;
 	}
 	
 	private void populateList(){
@@ -188,12 +190,12 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 			}).start();
 		}else if(command == cmdImportar){
 			contatos = new ListaGrafica(this);
-			display.setCurrent(new Splash("Carregando..."));
 			new Thread(new Runnable() {
 				public void run() {
 					try {
 						Operadora.importa();
-						configuraContatos();
+						inicializado = false;
+						startApp();
 						display.setCurrent(contatos);
 					} catch (Exception e) {
 						showError("Erro ao importar.\n"+e.getMessage()+"\n"+e.getClass());
@@ -335,7 +337,7 @@ public class Contatos extends MIDlet implements CommandListener, ListaListener, 
 	private void configuraContatos(){
 		contatos.setCommandListener(this);
 		contatos.addCommand(cmdSair);
-		contatos.addCommand(cmdChamar);/*
+		contatos.addCommand(cmdChamar);
 		contatos.addCommand(cmdImportar);
 		contatos.addCommand(cmdExportar);//*/
 		contatos.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_LARGE));

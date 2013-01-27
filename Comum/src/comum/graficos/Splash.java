@@ -41,6 +41,7 @@ public class Splash extends Canvas {
 	}
 
 	protected void paint(Graphics g) {
+		System.out.println(scrollImgs);
 		int width = getWidth();
 		int height = getHeight();
 		int fontHeight = g.getFont().getHeight();
