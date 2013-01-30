@@ -6,5 +6,9 @@
     <string name="menu_settings">Settings</string>
     <string name="activity_title">Contatos</string>
     <string name="operadora">Opreadora</string>
+    <string name="title_activity_image_picker">ImagePicker</string>
+    <string name="nome">Nome</string>
+    <string name="numero">Número</string>
+    <string name="title_activity_image_piker">ImagePiker</string>
 
 </resources>
