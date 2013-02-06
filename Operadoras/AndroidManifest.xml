@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.aplicativo.FlipperActivity"
+            android:name="com.example.aplicativo.TestActivity"
             android:label="@string/title_activity_image_picker" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

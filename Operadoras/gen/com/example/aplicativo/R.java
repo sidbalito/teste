@@ -17,6 +17,11 @@ public final class R {
         public static final int g3=0x7f020003;
         public static final int g4=0x7f020004;
         public static final int ic_launcher=0x7f020005;
+        public static final int p0=0x7f020006;
+        public static final int p1=0x7f020007;
+        public static final int p2=0x7f020008;
+        public static final int p3=0x7f020009;
+        public static final int p4=0x7f02000a;
     }
     public static final class id {
         public static final int RelativeLayout1=0x7f070006;
@@ -35,6 +40,7 @@ public final class R {
         public static final int activity_image_piker=0x7f030000;
         public static final int activity_tela=0x7f030001;
         public static final int grid_item=0x7f030002;
+        public static final int test_layout=0x7f030003;
     }
     public static final class menu {
         public static final int activity_image_picker=0x7f060000;

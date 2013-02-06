@@ -1,20 +1,30 @@
 package com.example.aplicativo;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import android.R.integer;
+import android.R.string;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.provider.ContactsContract;
+import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -36,6 +46,7 @@ public class Tela extends Activity implements OnItemClickListener, OnItemLongCli
     };
 	private static final int PICK_IMAGE = 1;
 	private static final String OPERADORAS = "operadoras";
+	private static final String INTERNO = "interno";
 	private Cursor people;
 	private int indexName;
 	private int indexNumber;
@@ -48,7 +59,8 @@ public class Tela extends Activity implements OnItemClickListener, OnItemLongCli
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startup();
+    
+         startup();
         setContentView(R.layout.activity_tela);
         lv= (ListView)findViewById(R.id.contatos);
 
@@ -88,6 +100,7 @@ public class Tela extends Activity implements OnItemClickListener, OnItemLongCli
 		do {
 		    String strName   = people.getString(indexName);
 		    String number = people.getString(indexNumber);
+		    Log.e("", PhoneNumberUtils.stripSeparators(number));
         	HashMap<String, Object> map = new HashMap<String, Object>();
         	map.put("item1", strName);
         	map.put("item2", number);
@@ -119,6 +132,7 @@ public class Tela extends Activity implements OnItemClickListener, OnItemLongCli
 
 	@Override
 	public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
+		Log.e("", v.findViewById(R.id.imageView1).toString());
         startActivity( new Intent(ContactsContract.Intents.SHOW_OR_CREATE_CONTACT, Uri.parse("tel: 75360308") ));
 	}
 
@@ -168,11 +182,49 @@ public class Tela extends Activity implements OnItemClickListener, OnItemLongCli
 		}
 	}
 	
-	private void exporta(){
+	private void exportData(){
 		
 	}
 	
-	private void importa(){
+	private void importData(){
 		
 	}
+	
+	private void saveData() throws IOException{
+		FileOutputStream fo = openFileOutput(INTERNO,	MODE_PRIVATE);
+		fo.write(getOperadoras().getBytes());
+		fo.close();
+	}
+		
+	private String getOperadoras() {
+		Set<String> keys = operadoras.keySet();
+		StringBuffer sb =  new StringBuffer();
+		for (String number : keys) {
+			sb.append(getOperadora(number));
+			sb.append(';');
+			sb.append(number);
+			sb.append('\n');
+		}
+		return sb.toString();
+	}
+
+	private void loadData() throws IOException{
+		FileInputStream fi = openFileInput(INTERNO);
+		int len = fi.available();
+		byte[] buffer =  new byte[len];
+		fi.read(buffer );
+		setOperadoras(buffer);
+		fi.close();
+	}
+
+	private void setOperadoras(byte[] buffer) {
+		for(int i = 0; i<buffer.length;i++){
+			
+		}
+			
+	}
+	
+    public void imageClick(View v){
+    	Log.e("", "clicou na imagem: "+((View)v.getParent()).getTag());
+    }
 }

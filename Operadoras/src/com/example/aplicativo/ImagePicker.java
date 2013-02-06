@@ -9,6 +9,7 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
@@ -19,6 +20,16 @@ public class ImagePicker extends Activity {
 	public static final String NUMERO = "numero";
 	public static final String ICONE = "icone";
 	static final String POSITION = "position";
+	
+	public static final String DRAWABLE =  Tela.DRAWABLE;
+	public static final String[] ICONES = new String[]{
+    	DRAWABLE+R.drawable.p0,
+    	DRAWABLE+R.drawable.p1,
+    	DRAWABLE+R.drawable.p2,
+    	DRAWABLE+R.drawable.p3,
+    	DRAWABLE+R.drawable.p4
+    };
+
 	
 	private GestureDetector gd;
 	private ViewFlipper vf;
@@ -34,9 +45,9 @@ public class ImagePicker extends Activity {
 		position = intent.getIntExtra(POSITION, 0);
 		vf = (ViewFlipper) findViewById(R.id.view_flipper);// new ViewFlipper(this);
 		ImageView iv;
-		for(int i = 0; i<Tela.ICONES.length;i++){
+		for(int i = 0; i<ICONES.length;i++){
 			iv = new ImageView(this);
-			iv.setImageURI(Uri.parse(Tela.ICONES[i]));
+			iv.setImageURI(Uri.parse(ICONES[i]));
 			vf.addView(iv);
 		}
 		vf.setDisplayedChild(intent.getIntExtra(ICONE, 0));
@@ -93,4 +104,7 @@ class GestureListener extends SimpleOnGestureListener{
      	
    	return true;
     }
+    
+    
+    
 }

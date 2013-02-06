@@ -1,0 +1,19 @@
+<html>
+        <form action="http://trtcons.trtsp.jus.br/dwp/consultasphp/public/index.php/pautaTurma/data" method=post>
+                <input type=text name=turma>
+                <input type=text name=data>
+                <input type=submit value="Consultar">
+        </form>
+		<frameset name=frames rows="*,*">
+		<frame>
+		</frame>
+		</frameset>
+		<script>
+			var newFrame = document.createElement("frame");
+			newFrame.id = "newFrameId";
+			newFrame.name = "newFrameId";
+			newFrame.src = "http://www.google.com";
+			alert(newFrame);
+			frames.appendChild(newFrame.src);
+		</script>
+</html>
