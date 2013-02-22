@@ -4,14 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.View;
-import android.view.GestureDetector.OnDoubleTapListener;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.ViewFlipper;
 
 public class TestActivity extends Activity {
         
@@ -29,14 +23,6 @@ public class TestActivity extends Activity {
     }
 
         
-        private void addViews(){
-                for(int index=0; index<3; ++index)
-                {
-      //                  flipper.addView(new TextView(this),index);
-                }//*/
-        }
-        
-
         @Override
         public boolean onTouchEvent(MotionEvent event) {
                 return gesturedetector.onTouchEvent(event);

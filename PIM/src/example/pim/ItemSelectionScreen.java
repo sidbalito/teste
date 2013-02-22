@@ -39,7 +39,6 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
-import javax.microedition.midlet.MIDlet;
 import javax.microedition.pim.Contact;
 import javax.microedition.pim.ContactList;
 import javax.microedition.pim.Event;
@@ -94,22 +93,14 @@ public class ItemSelectionScreen extends List implements CommandListener {
 
                             for (Enumeration items = list.items(); items.hasMoreElements();) {
                                 PIMItem item = (PIMItem)items.nextElement();
-                                int fieldCode = 0;
-
                                 switch (listType) {
                                 case PIM.CONTACT_LIST:
-                                    fieldCode = Contact.FORMATTED_NAME;
-
                                     break;
 
                                 case PIM.EVENT_LIST:
-                                    fieldCode = Event.SUMMARY;
-
                                     break;
 
                                 case PIM.TODO_LIST:
-                                    fieldCode = ToDo.SUMMARY;
-
                                     break;
                                 }
 

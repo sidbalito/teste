@@ -1,33 +1,24 @@
 package com.example.aplicativo;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
-import android.R.integer;
-import android.R.string;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.provider.ContactsContract;
-import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -45,7 +36,6 @@ public class Tela extends Activity implements OnItemClickListener, OnItemLongCli
     	DRAWABLE+R.drawable.g4
     };
 	private static final int PICK_IMAGE = 1;
-	private static final String OPERADORAS = "operadoras";
 	private static final String INTERNO = "interno";
 	private Cursor people;
 	private int indexName;
@@ -119,7 +109,8 @@ public class Tela extends Activity implements OnItemClickListener, OnItemLongCli
 	}
 
 	private void setIcon(int index, int icon, List<HashMap<String, Object>> maps){
-         	HashMap<String, Object> map = (HashMap<String, Object>) adapter.getItem(index);
+         	@SuppressWarnings("unchecked")
+			HashMap<String, Object> map = (HashMap<String, Object>) adapter.getItem(index);
         	map.put("icone", ICONES[icon]);
         	setOperadora((String) map.get("item2"), icon);
 //        	maps.set(index, map);
@@ -182,15 +173,15 @@ public class Tela extends Activity implements OnItemClickListener, OnItemLongCli
 		}
 	}
 	
-	private void exportData(){
+	void exportData(){
 		
 	}
 	
-	private void importData(){
+	void importData(){
 		
 	}
 	
-	private void saveData() throws IOException{
+	void saveData() throws IOException{
 		FileOutputStream fo = openFileOutput(INTERNO,	MODE_PRIVATE);
 		fo.write(getOperadoras().getBytes());
 		fo.close();
@@ -208,7 +199,7 @@ public class Tela extends Activity implements OnItemClickListener, OnItemLongCli
 		return sb.toString();
 	}
 
-	private void loadData() throws IOException{
+	void loadData() throws IOException{
 		FileInputStream fi = openFileInput(INTERNO);
 		int len = fi.available();
 		byte[] buffer =  new byte[len];

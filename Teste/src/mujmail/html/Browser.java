@@ -22,7 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 import java.util.Stack;
 import java.util.Vector;
 
-import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;

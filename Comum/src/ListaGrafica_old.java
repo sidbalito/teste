@@ -5,7 +5,7 @@ import java.util.Vector;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 
-public class ListaGrafica extends Canvas{
+public class ListaGrafica_old extends Canvas{
 
 	private Vector items;//coleção de strings da lista
 	private int topIndex;//primeiro item visível
@@ -13,7 +13,7 @@ public class ListaGrafica extends Canvas{
 	private int selectedIndex;//o item atualmente selecionado, -1 significa que nenhum item foi selecionado
 	private KeyListener keyListener;
 		
-	public ListaGrafica(KeyListener keyListener){
+	public ListaGrafica_old(KeyListener keyListener){
 		this.keyListener = keyListener;
 		items = new Vector();//inicializa a lista de strings
 	}
@@ -58,7 +58,7 @@ public class ListaGrafica extends Canvas{
 				break;
 			}
 			if(itemIndex == selectedIndex) g.drawRect(0, y, g.getClipWidth()-2, fontHeight);
-			g.drawString((String) items.elementAt(itemIndex), 2, y, 0);
+			g.drawString(items.elementAt(itemIndex).toString(), 2, y, 0);
 			
 		}
 	}

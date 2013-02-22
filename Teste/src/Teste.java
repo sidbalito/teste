@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -18,13 +17,11 @@ import javax.microedition.midlet.MIDlet;
 import mujmail.html.Browser;
 //Midlet's User interface API
 //import javax.microedition.midlet.*;
-import mujmail.html.Parser;
 
 public class Teste extends MIDlet
 			implements CommandListener {
 
 	private static final int HTTP_INPUT_BUFFER_SIZE = 1024;
-	private static final String SUCCESS_MESSAGE = null;
 	private Form helloForm;
 	private Command exitCommand;
 
@@ -71,7 +68,7 @@ public class Teste extends MIDlet
   	helloForm.addCommand(exitCommand);
   	helloForm.setCommandListener(this);//*/
 	  //connect();
-	  Display.getDisplay(this).setCurrent(new Browser("<html>Texto <u>sublinhado<u> resublinhado</u> sublinhado</u> e normal</html>"));//(new HTTP().doPost("http://trtcons.trtsp.jus.br/dwp/consultasphp/public/index.php/pautaTurma/data", "turma=1"))));
+	  Display.getDisplay(this).setCurrent(new ColorPicker(false));// Browser("<html>Texto <u>sublinhado<u> resublinhado</u> sublinhado</u> e normal</html>"));//(new HTTP().doPost("http://trtcons.trtsp.jus.br/dwp/consultasphp/public/index.php/pautaTurma/data", "turma=1"))));
 
   }
 
@@ -80,9 +77,7 @@ public class Teste extends MIDlet
    */
 
   protected void startApp() {
-	  //connect();
-	  PautaTurma pt;
-	try {/*
+	  try {/*
 		for(int i = 1; i < 19; i++){
 			pt = new PautaTurma(sendData(new StringBuffer("turma="+i), "http://trtcons.trtsp.jus.br/dwp/consultasphp/public/index.php/pautaTurma/data"));
 			String[] values = pt.getValues("dataForm");
@@ -127,9 +122,7 @@ public class Teste extends MIDlet
 	    //c.setRequestProperty("Accept-Charset","UTF-8;q=0.7,*;q=0.7");
 	    is = c.openInputStream(); // transition to connected!
 	    
-	    //System.out.println();
-	    int i = 0;
-		int ch = 0;
+	    int ch = 0;
 		while(ch != -1){
 	    	sb.append((char)ch);
 	    	ch = is.read();
@@ -171,7 +164,7 @@ public class Teste extends MIDlet
 	  Display.getDisplay(this).setCurrent(new Browser((sb.toString())));
   }
   
-  private String sendData(StringBuffer data,String serverUrl) throws IOException  
+  String sendData(StringBuffer data,String serverUrl) throws IOException  
   {            
       HttpConnection connection = (HttpConnection) Connector.open(serverUrl,Connector.READ_WRITE);
       
@@ -245,7 +238,6 @@ public class Teste extends MIDlet
 class PautaTurma{
 	private static final int VALUE = 1;
 	private static final int VAR = 0;
-	private static final int ARRAY = 2;
 	private static final Hashtable values = new Hashtable();
 
 	public PautaTurma(String resposta) {
@@ -253,7 +245,6 @@ class PautaTurma{
 		int mode = VAR;
 		boolean string = false;
 		byte[] resp = resposta.getBytes();
-		boolean valid = false;
 		StringBuffer sb = new StringBuffer();
 		int count = 0;
 		boolean array = false;

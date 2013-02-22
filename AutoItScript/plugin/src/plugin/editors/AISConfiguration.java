@@ -14,12 +14,10 @@ import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 public class AISConfiguration extends SourceViewerConfiguration {
 	private static final Display CURR_DISP = Display.getCurrent();
-	private static final TextAttribute WORD = new TextAttribute(new Color(CURR_DISP, IAISColorConstants.WORD));
 	private static final TextAttribute NUMBER = new TextAttribute(new Color(CURR_DISP, IAISColorConstants.NUMBER));
 	private static final TextAttribute MACRO = new TextAttribute(new Color(CURR_DISP, IAISColorConstants.MACRO));
 	private static final TextAttribute VAR = new TextAttribute(new Color(CURR_DISP, IAISColorConstants.MACRO));

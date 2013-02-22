@@ -70,7 +70,6 @@ public class Operadora {
 		for(i = 1; i <= rs.getNumRecords();i++){
 			registro = new String(rs.getRecord(i));
 			System.out.println("Loading: "+registro);
-			int len = registro.length();
 			int codOperadora = registro.charAt(0)-0x30;
 			String numero = registro.substring(2);
 			System.out.println(codOperadora + ";" + numero);
@@ -88,9 +87,7 @@ public class Operadora {
         byte[] buff = new byte[(int) len];
 		fis.read(buff);
 		fromBytes(buff);
-		int campo = 0;
-		int codOperadora = 0; 
-		StringBuffer numero = new StringBuffer(); 
+		new StringBuffer(); 
 	}
 
 	public static Enumeration getNumeros() {

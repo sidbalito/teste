@@ -15,11 +15,11 @@ import comum.KeyBoard;
 public class ListaGrafica extends Canvas{
 
 	private static final int CLAREADOR = 0x404040;
-	private Vector items, icones;//coleção de strings da lista
+	protected Vector items, icones;//coleção de strings da lista
 	private int topIndex;//primeiro item visível
 	private int bottomIndex;//ultimo item visível
 	private int selectedIndex;//o item atualmente selecionado, -1 significa que nenhum item foi selecionado
-	private ListaListener listaListener;
+	protected ListaListener listaListener;
 	private int graphicsHeight;
 	private int graphicsWidth;
 	private int fBkColor = 0xFFFFFF;
@@ -54,12 +54,12 @@ public class ListaGrafica extends Canvas{
 
 	protected void paint(Graphics g) {
 		if(g.getFont() != font)g.setFont(font);
+		if(font == null)font = g.getFont();
 		int itemHeight = 32, fontHeight = font.getHeight();
 		if(graphicsHeight == 0 || graphicsWidth== 0) {
 			graphicsHeight = g.getClipHeight();
 			graphicsWidth = g.getClipWidth();
 		}
-		
 		int y = 0;
 		int itemIndex;
 		int maxItensTela = graphicsHeight/itemHeight-1;
@@ -94,9 +94,10 @@ public class ListaGrafica extends Canvas{
 		y = selctedY;
 		g.setColor(fBkColor|CLAREADOR);
 		g.fillRect(0, y, graphicsWidth-2, itemHeight-1);
-		String detail = listaListener.getDetail(selItemIndex);
+		String detail =null;
+		if(listaListener != null) detail = listaListener.getDetail(selItemIndex);
 		g.setColor(fColor);
-		if(detail != ""){					
+		if(detail != null){					
 			int y1 = y+(fontHeight>>2);
 			y1 +=((selectedIndex >= bottomIndex)? -fontHeight:fontHeight);
 			g.setColor(detailColor);
@@ -114,7 +115,6 @@ public class ListaGrafica extends Canvas{
 	public void append(String s, Image icone) {
 		if(ordered){
 			int index = getInsertPos(s);
-			
 			items.insertElementAt(s, index);
 			icones.insertElementAt(icone, index);
 		} else {

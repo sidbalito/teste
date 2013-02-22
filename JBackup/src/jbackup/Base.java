@@ -10,12 +10,20 @@ import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+
+import auxiliar.Util;
 
 public class Base {
 	private static final String ALGORITM = "MD5";
 	private static final int BUFFER_SIZE = 1024;
+	private static final long BIT = 1;
+	private static final long MASK = 0x3F;
+	private static final long ZERO = 0;
 	private byte[] buffer = new byte[BUFFER_SIZE];
 	private String tempFileName = "TEMP.TMP";
+	private HashMap<Long, Long> filesLens = new HashMap<Long, Long>();
+	private HashMap<byte[], String> digests = new HashMap<byte[], String>();
 	public Base(String[] strings) throws NoSuchAlgorithmException, IOException {
 	}
 	
@@ -39,9 +47,12 @@ public class Base {
 			digest = digestFile(din, out);
 			renFile(digest);
 		} else {
+			//TODO: a conversão de byte[] para String é via new String(byte[])
 			digest = digestFile(din);
-			if(firstDigest(digest)) {
-				copyFile(din, out);
+			String fileName = file.getAbsolutePath();
+			if(firstDigest(digest, fileName )) {
+				//obs.: din e in são instâncias diferentes abrindo o mesmo arquivo simultâneamente
+				copyFile(new FileInputStream(file), out);  
 				addPath(digest, file);
 				renFile(digest);
 			}
@@ -52,9 +63,11 @@ public class Base {
 	}
 
 
-	private void copyFile(DigestInputStream din, OutputStream out) {
-		// TODO: copiar conteúdo para o arquivo temporário
-		
+	private void copyFile(InputStream in, OutputStream out) throws IOException {
+		while(in.available()>0){
+			in.read(buffer);
+			out.write(buffer);
+		}
 	}
 
 
@@ -64,8 +77,12 @@ public class Base {
 	}
 
 
-	private boolean firstDigest(byte[] digest) {
+	private boolean firstDigest(byte[] digest, String path) {
 		// TODO: verificar se há ocorrencias do digest na lista
+		System.out.println(Util.bytesToHex(digest)+path);
+		String paths = digests.get(digest);
+		if(paths == null) paths = new String();
+		//StringBuffer sb = new StringBuffer(paths).append(path);
 		return false;
 	}
 
@@ -86,9 +103,14 @@ public class Base {
 		
 	}
 
-
+	/**
+	 * Lê conteúdo do arquivo para verificar o digest. Se out não for nulo simultâneamente envia os bytes lidos para a saída
+	 * @param din stream de entrada com capacidade de gerar digest do conteúdo
+	 * @param out stream de saída para gravação simultânea à leitura
+	 * @return digest do conteúdo do arquivo lido
+	 * @throws IOException
+	 */
 	private byte[] digestFile(DigestInputStream din, OutputStream out) throws IOException {
-		// TODO: carregar conteúdo do arquivo para verificar seu hash e copiar conteúdo se for o caso
 		while(din.available()>0){
 			din.read(buffer);
 			if(out != null)out.write(buffer);
@@ -98,8 +120,14 @@ public class Base {
 
 
 	private boolean firstLen(long fileLen) {
-		// TODO: verificar se é o primeiro arquivo com este tamanho
-		return false;
+		//FEITO: verificar se é o primeiro arquivo com este tamanho
+		long faixa = fileLen & ~MASK;
+		long bit = BIT << (fileLen & MASK);
+		Long bits = filesLens.get(faixa);
+		if(bits == null) bits = ZERO;
+		if((bits & bit)!=0)return false;
+		filesLens.put(faixa, bits | bit);
+		return true;
 	}
 }
 

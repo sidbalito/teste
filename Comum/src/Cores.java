@@ -6,5 +6,6 @@ public final class Cores {
 	public static final int AZUL = 0xFF;
 	public static final int AMARELO = 0xFFFF00;
 	public static final int PRETO = 0;
+	public static final int AZUL_ESCURO = 0x7F;
 
 }

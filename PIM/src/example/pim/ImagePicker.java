@@ -3,8 +3,6 @@ package example.pim;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Display;
-import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
