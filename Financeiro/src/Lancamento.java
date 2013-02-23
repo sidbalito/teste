@@ -1,8 +1,9 @@
 import java.util.Calendar;
 import java.util.Date;
 
-public class Lancamento {
+public class Lancamento implements Serializable {
 	private static final char DATE_SEPARATOR = '/';
+	private static final char SEPARATOR = ';';
 	private int valor;
 	private long data;
 	private String descricao;
@@ -36,7 +37,24 @@ public class Lancamento {
 	}
 	
 	public String toString() {
-		return descricao;
+		StringBuffer sb = new StringBuffer();
+		sb.append(getDescricao());
+		sb.append(';');
+		sb.append(getValor());
+		sb.append(';');
+		sb.append(getData());
+		return sb.toString();
+	}
+	
+	public Serializable fromString(String s){
+		int inicio = 0, fim = s.indexOf(SEPARATOR);
+		descricao = s.substring(inicio, fim);
+		inicio = fim+1;
+		fim = s.indexOf(SEPARATOR, inicio);
+		valor = Integer.parseInt(s.substring(inicio, fim));
+		inicio = fim+1;
+		data = Long.parseLong(s.substring(inicio));	
+		return new Lancamento(descricao, valor, data);
 	}
 	
 	public String printValor(){

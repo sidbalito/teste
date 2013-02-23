@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -10,60 +12,77 @@ import javax.microedition.io.file.FileSystemRegistry;
 
 
 public class Persistencia implements Runnable{
-	private static final String ARQUIVO = "lancamentos.csv";
+	private static final String EXTENSAO = ".csv";
 	public static final int EXPORTAR = 0;
 	public static final int IMPORTAR = 1;
+	private static final String ENCODING = "ASCII";
 	private long fileLen;
 	private int modo;
-	private Vector lancamentos;
+	private Vector items;
 	private String url;
+	private String arquivo;
+	private Serializable serializable;
 
-	public Persistencia(int modo, Vector lancamentos) {
-		this.modo = modo;
-		this.lancamentos = lancamentos;
-		new Thread(this).start();
-	}
-
-	private void saveData(Vector lancamentos){
-		StringBuffer sb = new StringBuffer();
-		for(int i=0; i<lancamentos.size()-1;i++){
-			Lancamento lancamento = (Lancamento) lancamentos.elementAt(i);
-			sb.append(lancamento.getDescricao());
-			sb.append(';');
-			sb.append(lancamento.getValor());
-			sb.append(';');
-			sb.append(lancamento.getData());
-			sb.append('\n');
-		}
-		OutputStream output;
-		try {
-			output = openFile().openDataOutputStream();
-			output.write(sb.toString().getBytes());
-			output.flush();
-			output.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	
 	private FileConnection openFile() throws IOException{
 		Enumeration e = FileSystemRegistry.listRoots();
         String root = (String)e.nextElement();
-        url = "file://localhost/"+root +ARQUIVO;
+        url = "file://localhost/"+root +arquivo+EXTENSAO;
         FileConnection fc = (FileConnection)Connector.open(url, Connector.READ_WRITE);
         if(!fc.exists())fc.create();
         fileLen = fc.fileSize();//*/
-        return fc;
+         return fc;
 		
 	}
 
-
-	private void loadData(Vector lancamentos) {
+	private void saveData(){
+		String s = saveLancamentos().toString();
+		OutputStreamWriter output;
 		try {
-			InputStream input = openFile().openInputStream();
-			byte[] bytes = new byte[(int) fileLen];
+			output = new  OutputStreamWriter(openFile().openDataOutputStream(), ENCODING) ;
+			System.out.println(output);
+			output.write(s);
+			output.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+		
+	private StringBuffer saveLancamentos() {
+		StringBuffer sb = new StringBuffer();
+		for(int i=0; i<items.size()-1;i++){
+			Lancamento lancamento = (Lancamento) items.elementAt(i);
+			sb.append(lancamento.toString());
+			/*
+			sb.append(lancamento.getDescricao());
+			sb.append(';');
+			sb.append(lancamento.getValor());
+			sb.append(';');
+			sb.append(lancamento.getData());//*/
+			sb.append('\n');
+		}
+		return sb;
+	}
+
+	private void loadData() {
+		try {
+			InputStreamReader input = new InputStreamReader(openFile().openInputStream(), ENCODING);
+			char[] bytes = new char[(int) fileLen];
 			input.read(bytes);
+			int inicio = 0;
+			for(int i = 0; i < bytes.length; i++){
+				if(bytes[i] == '\n'){
+					int fim = i;
+					items.addElement(serializable.fromString(new String(bytes, inicio, fim-inicio)));//loadLancamentos(bytes);
+					inicio = fim+1; 
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void loadLancamentos(char[] bytes) {
 			StringBuffer sb = new StringBuffer();
 			String descricao = null;
 			int valor = 0;
@@ -79,28 +98,27 @@ public class Persistencia implements Runnable{
 					sb.setLength(0);
 					campo++;
 					if(campo == 3){
-						lancamentos.addElement(new Lancamento(descricao, valor, data));
+						items.addElement(new Lancamento(descricao, valor, data));
 						campo = 0;
 					}
 					continue;
 				}
-				sb.append((char)bytes[i]);
+				sb.append(bytes[i]);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
-
-	public void executa() {
-		switch(modo){
-		case EXPORTAR: saveData(lancamentos);break; 
-		case IMPORTAR: loadData(lancamentos);break; 
-		}
-		
+	public void executa(Vector items, int modo, String section, Serializable serializable) {
+		this.modo = modo;
+		this.items = items;
+		this.arquivo = section;
+		this.serializable = serializable;
+		new Thread(this).start();
 	}
 
 	public void run() {
-		executa();
+		switch(modo){
+		case EXPORTAR: saveData();break; 
+		case IMPORTAR: loadData();break; 
+		}
 	}
 }

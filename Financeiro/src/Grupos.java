@@ -9,9 +9,17 @@ import comum.graficos.RichStringItem;
 
 public class Grupos extends RichList{
 	private static final String OK = "Ok";
-	public static final Command CMD_OK = new Command(OK, Command.OK, 0);
 	private static final String CANCEL = "Cancelar";
+	private static final String INSERIR = "Inserir";
+	private static final String ALTERAR = "Alterar";
+	private static final String EXCLUIR = "Excluir";
+	
+	public static final Command CMD_OK = new Command(OK, Command.OK, 0);
 	public static final Command CMD_CANCEL = new Command(CANCEL, Command.CANCEL, 0);
+	public static final Command CMD_EXCLUIR = new Command(EXCLUIR, Command.ITEM, 0);  
+	public static final Command CMD_ALTERAR = new Command(ALTERAR, Command.ITEM, 0);  
+	public static final Command CMD_INSERIR = new Command(INSERIR, Command.ITEM, 0);
+	
 	private static final int KEY_FIRE = -5;
 	private static Vector grupos = new Vector();
 	private static Hashtable tabela = new Hashtable();
@@ -19,9 +27,12 @@ public class Grupos extends RichList{
 	public Grupos() {
 		super(null, grupos, new RichStringItem());
 		setColor(Cores.AZUL_ESCURO, Cores.BRANCO);
-		for(int i = 0;i<5;i++) grupos.addElement("Teste"+i);
+		new Persistencia().executa(grupos, Persistencia.IMPORTAR, Financeiro.GRUPOS, new Grupo());
 		addCommand(CMD_OK);
 		addCommand(CMD_CANCEL);
+		addCommand(CMD_INSERIR);
+		addCommand(CMD_EXCLUIR);
+		addCommand(CMD_ALTERAR);
 	}
 
 	public String getSelectedGrupo() {

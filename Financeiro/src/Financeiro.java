@@ -22,35 +22,37 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 	private static final String SAIR = "Sair";
 	private static final String EXPORTAR = "Exportar";
 	private static final String IMPORTAR = "Importar";
-	private static final String GRUPOS = "Grupos";
+	static final String GRUPOS = "Grupos";
 	private static final String MARCAR = "Marcar";
 	private static final String CANCELAR = "Cancelar";
+	private static final String LACAMENTOS = "Lançamentos";
 	private Vector lancamentos = new Vector();
 	private int currItem;
 	private EditaLancamento editaLancamento = new EditaLancamento(this);
 	private RichList lista = new RichList(this, lancamentos, new RichLancamento());
 	private Display display;
 	private Displayable telaAtual = lista;
-	private Command inserir = new Command(INSEIR, Command.OK, 0);
-	private Command editar = new Command(EDITAR, Command.ITEM, 0);
-	private Command excluir = new Command(EXCLUIR, Command.ITEM, 0);
-	private Command sair = new Command(SAIR, Command.EXIT, 0);
-	private Command exportar = new Command(EXPORTAR, Command.ITEM, 1);
-	private Command importar = new Command(IMPORTAR, Command.ITEM, 1);
-	private Command grupos = new Command(GRUPOS, Command.ITEM, 1);
+	private Command cmdInserir = new Command(INSEIR, Command.OK, 0);
+	private Command cmdEditar = new Command(EDITAR, Command.ITEM, 0);
+	private Command cmdExcluir = new Command(EXCLUIR, Command.ITEM, 0);
+	private Command cmdSair = new Command(SAIR, Command.EXIT, 0);
+	private Command cmdExportar = new Command(EXPORTAR, Command.ITEM, 1);
+	private Command cmdImportar = new Command(IMPORTAR, Command.ITEM, 1);
+	private Command cmdGrupos = new Command(GRUPOS, Command.ITEM, 1);
 	private Grupos telaGrupos = new Grupos();
 	private Command marcar = new Command(MARCAR, Command.ITEM, 0);
 	private Command cancelar = new Command(CANCELAR, Command.ITEM, 0);
 	private RichList grupo;
+	private Vector grupos = new Vector();
 	
 	public Financeiro() {
-		lista.addCommand(grupos);
-		lista.addCommand(exportar);
-		lista.addCommand(importar);
-		lista.addCommand(excluir);
-		lista.addCommand(editar);
-		lista.addCommand(inserir);
-		lista.addCommand(sair);
+		lista.addCommand(cmdGrupos);
+		lista.addCommand(cmdExportar);
+		lista.addCommand(cmdImportar);
+		lista.addCommand(cmdExcluir);
+		lista.addCommand(cmdEditar);
+		lista.addCommand(cmdInserir);
+		lista.addCommand(cmdSair);
 		lista.setCommandListener(this);
 		telaGrupos.setCommandListener(this);
 		//lista.setItems(items);
@@ -63,7 +65,7 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 	protected void startApp() throws MIDletStateChangeException {
 		if(Fluxo.getMIDlet() == null)Fluxo.setMIDlet(this);
 		if(display == null) display = Display.getDisplay(this);
-		for(int i = 1; i<40;i++)lancamentos.addElement(new Lancamento("Lançamento"+i, 0, System.currentTimeMillis()));
+		//for(int i = 1; i<40;i++)lancamentos.addElement(new Lancamento("Lançamento"+i, 0, System.currentTimeMillis()));
 		mostraTela(null);
 	}
 	
@@ -89,19 +91,26 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 			editaLancamentoCommand(command, (EditaLancamento) tela);
 		if(tela instanceof Grupos)
 			gruposCommand(command, (Grupos) tela);
-		if(command == sair) notifyDestroyed();
-		else if(command == inserir) novoLancamento();
-		else if(command == editar) editaLancamento(lista.getSelected());
-		else if(command == excluir) excluiLancamento(lista.getSelected());
-		else if(command == exportar) new Persistencia(Persistencia.EXPORTAR, lancamentos);
-		else if(command == grupos) mostraTela(telaGrupos);
-		else if(command == importar) {
-			new Persistencia(Persistencia.IMPORTAR, lancamentos);
-		} 
+		if(command == cmdSair) notifyDestroyed();
+		else if(command == cmdInserir) novoLancamento();
+		else if(command == cmdEditar) editaLancamento(lista.getSelected());
+		else if(command == cmdExcluir) excluiLancamento(lista.getSelected());
+		else if(command == cmdExportar) exporta();
+		else if(command == cmdGrupos) mostraTela(telaGrupos);
+		else if(command == cmdImportar) importa();
+
 		lista.repaint();
 		
 	}
 	
+	private void importa() {
+		new Persistencia().executa(lancamentos, Persistencia.IMPORTAR, LACAMENTOS, new Lancamento());
+	}
+
+	private void exporta() {
+		new Persistencia().executa(lancamentos, Persistencia.EXPORTAR, LACAMENTOS, new Lancamento());
+	}
+
 	private void gruposCommand(Command command, Grupos tela) {
 		
 		if(command == Grupos.CMD_OK){
@@ -113,6 +122,9 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 			mostraTela(grupo);
 		} else if(command == Grupos.CMD_CANCEL){
 			mostraTela(lista);
+		} else if (command ==  Grupos.CMD_ALTERAR){
+		} else if (command ==  Grupos.CMD_EXCLUIR){
+		} else if (command ==  Grupos.CMD_INSERIR){			
 		}
 	}
 

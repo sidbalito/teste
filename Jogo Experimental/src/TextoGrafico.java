@@ -12,7 +12,6 @@ public class TextoGrafico {
 	private static final String SIMBOLOS = "?!.,:~<>[] ";
 	static final int LARG = 12;
 	final static int ALT = 13;
-	private Texto[] textos;
 	private static Image letras2;
 	private static Image letras1;
 	private static Image letras;
