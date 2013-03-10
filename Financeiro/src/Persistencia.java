@@ -10,6 +10,8 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
 
+import comum.graficos.RichList;
+
 
 public class Persistencia implements Runnable{
 	private static final String EXTENSAO = ".csv";
@@ -22,6 +24,7 @@ public class Persistencia implements Runnable{
 	private String url;
 	private String arquivo;
 	private Serializable serializable;
+	private RichList lista;
 
 	
 	private FileConnection openFile() throws IOException{
@@ -40,9 +43,9 @@ public class Persistencia implements Runnable{
 		OutputStreamWriter output;
 		try {
 			output = new  OutputStreamWriter(openFile().openDataOutputStream(), ENCODING) ;
-			System.out.println(output);
 			output.write(s);
 			output.flush();
+			output.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -50,7 +53,7 @@ public class Persistencia implements Runnable{
 		
 	private StringBuffer saveLancamentos() {
 		StringBuffer sb = new StringBuffer();
-		for(int i=0; i<items.size()-1;i++){
+		for(int i=0; i<items.size();i++){
 			Lancamento lancamento = (Lancamento) items.elementAt(i);
 			sb.append(lancamento.toString());
 			/*
@@ -83,6 +86,7 @@ public class Persistencia implements Runnable{
 	}
 
 	private void loadLancamentos(char[] bytes) {
+		//TODO: utilidade
 			StringBuffer sb = new StringBuffer();
 			String descricao = null;
 			int valor = 0;
@@ -107,10 +111,11 @@ public class Persistencia implements Runnable{
 			}
 	}
 
-	public void executa(Vector items, int modo, String section, Serializable serializable) {
+	public void executa(Vector items, int modo, String section, Serializable serializable, RichList lista) {
 		this.modo = modo;
 		this.items = items;
 		this.arquivo = section;
+		this.lista = lista;
 		this.serializable = serializable;
 		new Thread(this).start();
 	}
@@ -120,5 +125,6 @@ public class Persistencia implements Runnable{
 		case EXPORTAR: saveData();break; 
 		case IMPORTAR: loadData();break; 
 		}
+		lista.repaint();
 	}
 }

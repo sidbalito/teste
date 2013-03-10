@@ -50,17 +50,13 @@ public class RichLancamento implements RichItem {
 			g.drawImage(icone, 0, 0, 0);
 			x = icone.getWidth();
 		}
-		if(selected){
-			g.setColor(0xFF0000);
-			g.drawString(lancamento.getDescricao(), x, 0, 0);
-			g.drawString(lancamento.printData(), x, itemHeight, 0);
-			g.drawString(lancamento.printValor(), g.getClipWidth(), itemHeight, Graphics.RIGHT|Graphics.TOP);
-			itemHeight = itemHeight << 1;
-		}
-		else {
-			g.setColor(0xFF);
-			g.drawString(lancamento.getDescricao(), x, 0, 0);
-		}
+		if(selected) g.setColor(0xFF0000);
+		else g.setColor(0xFF);
+		g.drawString(lancamento.getDescricao(), x, 0, 0);
+		g.drawString(lancamento.printData(), x, fontHeight, 0);
+		g.drawString(lancamento.printValor(), g.getClipWidth(), fontHeight, Graphics.RIGHT|Graphics.TOP);
+//		g.drawString(lancamento.getDescricao(), x, 0, 0);
+		
 		return itemHeight;
 	}
 

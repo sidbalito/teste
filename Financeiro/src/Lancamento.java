@@ -4,10 +4,13 @@ import java.util.Date;
 public class Lancamento implements Serializable {
 	private static final char DATE_SEPARATOR = '/';
 	private static final char SEPARATOR = ';';
-	private int valor;
+	private static final char PONTO = '.';
+	private static final char VIRGULA = ',';
+	private static final char ZERO = '0';
+	private float valor;
 	private long data;
 	private String descricao;
-	public Lancamento(String descricao, int valor, long data) {
+	public Lancamento(String descricao, float valor, long data) {
 		this.setDescricao(descricao);
 		this.setValor(valor);
 		this.setData(data);
@@ -17,10 +20,10 @@ public class Lancamento implements Serializable {
 		this("", 0, System.currentTimeMillis());
 	}
 
-	public int getValor() {
+	public float getValor() {
 		return valor;
 	}
-	public void setValor(int valor) {
+	public void setValor(float valor) {
 		this.valor = valor;
 	}
 	public long getData() {
@@ -51,16 +54,24 @@ public class Lancamento implements Serializable {
 		descricao = s.substring(inicio, fim);
 		inicio = fim+1;
 		fim = s.indexOf(SEPARATOR, inicio);
-		valor = Integer.parseInt(s.substring(inicio, fim));
+		valor = Float.parseFloat(s.substring(inicio, fim));//Integer.parseInt(s.substring(inicio, fim));
 		inicio = fim+1;
 		data = Long.parseLong(s.substring(inicio));	
 		return new Lancamento(descricao, valor, data);
 	}
 	
-	public String printValor(){
-		StringBuffer sb = new StringBuffer(Integer.toString(valor));
+	public String printValor(){/*
+		StringBuffer sb = new StringBuffer(Float.toString(valor));
 		while(sb.length()<3)sb.insert(0, '0');
 		sb.insert(sb.length()-2, ',');
+		return sb.toString();//*/
+		StringBuffer sb = new StringBuffer(Float.toString(valor));
+		int len = sb.length();
+		int ponto = sb.toString().indexOf(PONTO);
+		int excesso = len-ponto-3;
+		if(excesso > 0)sb.setLength(len-excesso);
+		if(excesso < 0)sb.append(ZERO);
+		sb.setCharAt(ponto, VIRGULA);
 		return sb.toString();
 	}
 	

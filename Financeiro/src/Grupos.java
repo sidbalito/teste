@@ -20,14 +20,12 @@ public class Grupos extends RichList{
 	public static final Command CMD_ALTERAR = new Command(ALTERAR, Command.ITEM, 0);  
 	public static final Command CMD_INSERIR = new Command(INSERIR, Command.ITEM, 0);
 	
-	private static final int KEY_FIRE = -5;
-	private static Vector grupos = new Vector();
 	private static Hashtable tabela = new Hashtable();
 	
-	public Grupos() {
+	public Grupos(Vector grupos) {
 		super(null, grupos, new RichStringItem());
 		setColor(Cores.AZUL_ESCURO, Cores.BRANCO);
-		new Persistencia().executa(grupos, Persistencia.IMPORTAR, Financeiro.GRUPOS, new Grupo());
+		new Persistencia().executa(grupos, Persistencia.IMPORTAR, Financeiro.GRUPOS, new Grupo(), null);
 		addCommand(CMD_OK);
 		addCommand(CMD_CANCEL);
 		addCommand(CMD_INSERIR);
@@ -36,7 +34,7 @@ public class Grupos extends RichList{
 	}
 
 	public String getSelectedGrupo() {
-		return grupos.elementAt(getSelected()).toString();
+		return items.elementAt(getSelected()).toString();
 	}
 	
 	

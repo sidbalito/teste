@@ -51,8 +51,8 @@ public class RichList extends Canvas implements Drawable, Commandable{
 		selectedIndex = validateIndex(index);
 	}
 	
-	public RichItem getItem(int index){
-		if(items.size()>0) return ((RichItem) items.elementAt(index));;
+	public Object getItem(int index){
+		if(items.size()>0) return items.elementAt(index);;
 		return null;
 	}
 
@@ -73,6 +73,7 @@ public class RichList extends Canvas implements Drawable, Commandable{
 		int x = 0, y = 0;
 		int bottom = graphicsHeight;		
 		if(selectedIndex < topIndex)topIndex = selectedIndex;
+		if(items == null) items = new Vector();
 		for(int i = topIndex; i<items.size(); i++){
 			y = drawItem(imgItem.getGraphics(), i, x, y, false);
 			if(selectedIndex==i){
@@ -84,7 +85,6 @@ public class RichList extends Canvas implements Drawable, Commandable{
 			if(y > graphicsHeight & bottomIndex == i){
 				bottomIndex = i;
 				topIndex++;
-				System.out.println(topIndex);
 				break;
 			}
 		}
@@ -132,7 +132,6 @@ public class RichList extends Canvas implements Drawable, Commandable{
 		case KeyBoard.UP_KEY: if(index > 0) setSelected(index-1); repaint(); break;
 		case KeyBoard.DOWN_KEY: if(index < size()-1) setSelected(index+1); repaint(); break;
 		case KeyBoard.FIRE_KEY: {
-			System.out.println(listaListener);
 			if(listaListener != null)listaListener.clickItem(this, index);
 		}
 		}

@@ -17,7 +17,7 @@ public class Grupo implements Serializable {
 
 	public String toString(){
 		StringBuffer sb = new StringBuffer(name);
-		int len = sb.length();
+		int len = items.size();
 		for(int i = 0; i<len; i++){
 			sb.append(items.elementAt(i));
 			if(i+1 == len)sb.append(SEPARATOR);

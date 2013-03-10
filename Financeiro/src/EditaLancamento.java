@@ -47,7 +47,7 @@ public class EditaLancamento extends Form{
 
 	}
 
-	public void setLancamento(String descricao, int valor, long data) {
+	public void setLancamento(String descricao, float valor, long data) {
 		this.descricao.setString(descricao);
 		this.valor.setString(valor);
 		this.data.setDate(new Date(data));
@@ -74,15 +74,19 @@ class MoneyField extends TextField implements FormatableField{
 		super(label, text, maxSize, constraints);
 	}
 	
-	public int getValue(){
+	public float getValue(){
 		StringBuffer text = new StringBuffer(getString());
-		text.deleteCharAt(getString().indexOf(','));
-		return Integer.parseInt(text.toString());
+		text.setCharAt(getString().indexOf(','), '.');
+		System.out.println(text);
+		return Float.parseFloat(text.toString());
 	}
 
-	public void setString(int valor) {
-		setString(""+valor);
-		format();
+	public void setString(float valor) {
+		String val = Float.toString(valor);
+		StringBuffer text = new StringBuffer(val);
+		text.setCharAt(val.indexOf('.'), ',');
+		super.setString(text.toString());
+		//format();
 	}
 
 	public void format() {
