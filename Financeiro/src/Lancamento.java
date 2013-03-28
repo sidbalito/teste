@@ -20,6 +20,10 @@ public class Lancamento implements Serializable {
 		this("", 0, System.currentTimeMillis());
 	}
 
+	public Lancamento(String param) {
+		fromString(param);
+	}
+
 	public float getValor() {
 		return valor;
 	}
@@ -81,7 +85,7 @@ public class Lancamento implements Serializable {
 		StringBuffer sb = new StringBuffer();
 		sb.append(calendar.get(Calendar.DAY_OF_MONTH));
 		sb.append(DATE_SEPARATOR);
-		sb.append(calendar.get(Calendar.MONTH));
+		sb.append(calendar.get(Calendar.MONTH)+1);
 		sb.append(DATE_SEPARATOR);
 		sb.append(calendar.get(Calendar.YEAR));
 		return sb.toString();

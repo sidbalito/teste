@@ -3,20 +3,31 @@ import java.util.Vector;
 
 public class Grupo implements Serializable {
 
-	private static final char SEPARATOR = ',', EQUAL = '=';
-	private Vector items;
+	private static final char SEPARATOR = ';', EQUAL = '=';
+	private Vector items = new Vector();
 	private String name;
 
-	public Grupo(String name, Vector items) {
-		this.items = items;
+	public Grupo(String name, String descricoes) {
+		int i = 0, len = descricoes.length();
+		while(i < len){
+			int pos = descricoes.indexOf(SEPARATOR, i);
+			System.out.println(pos);
+			if(pos<0)break;
+			this.items.addElement(descricoes.substring(i, pos));
+			i = pos+1;
+		}
 		this.name = name;
 	}
 
 	public Grupo() {
+	}//*/
+	
+	public Vector getDescricoes(){
+		return items;		
 	}
 
 	public String toString(){
-		StringBuffer sb = new StringBuffer(name);
+		StringBuffer sb = new StringBuffer();
 		int len = items.size();
 		for(int i = 0; i<len; i++){
 			sb.append(items.elementAt(i));
@@ -37,7 +48,9 @@ public class Grupo implements Serializable {
 			items.addElement(string.substring(inicio, fim));
 			inicio = fim+1;
 		}
-		return new Grupo(name, items);
+		return null;// new Grupo(name, items);
 	}
+	
+	
 
 }

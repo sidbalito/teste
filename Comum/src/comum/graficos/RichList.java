@@ -70,6 +70,11 @@ public class RichList extends Canvas implements Drawable, Commandable{
 		g.setColor(fBkColor);
 		g.fillRect(0, 0, graphicsWidth, graphicsHeight);
 		g.setColor(fColor);
+		Graphics gr = imgItem.getGraphics();
+		gr.setColor(fBkColor);
+		gr.fillRect(0, 0, graphicsWidth, graphicsHeight);
+		gr.setColor(fColor);
+		
 		int x = 0, y = 0;
 		int bottom = graphicsHeight;		
 		if(selectedIndex < topIndex)topIndex = selectedIndex;
@@ -184,6 +189,7 @@ public class RichList extends Canvas implements Drawable, Commandable{
 	}
 	
 	private int drawItem(Graphics g, int i, int x, int y, boolean before){
+		System.out.println("Indíce:"+i);
 		Graphics itemGraphics = img.getGraphics();
 		itemGraphics.setColor(0xFFFFFF);
 		itemGraphics.fillRect(0, 0, graphicsWidth, graphicsHeight);

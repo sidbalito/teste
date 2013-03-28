@@ -60,12 +60,12 @@ public class RichLancamento implements RichItem {
 		return itemHeight;
 	}
 
-	public void toggle(Lancamento item) {
+	public void toggle(Lancamento item, Object grupo) {
 		if(tabela == null) return;
 		String descricao = item.getDescricao();
 		if(tabela.containsKey(descricao)){
 			tabela.remove(descricao);
 		}
-		else tabela.put(descricao, this);
+		else tabela.put(descricao, grupo);
 	}
 }

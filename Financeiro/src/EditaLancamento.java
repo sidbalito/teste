@@ -3,6 +3,7 @@ import java.util.Date;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.DateField;
+import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.TextField;
@@ -21,13 +22,15 @@ public class EditaLancamento extends Form{
 	private static final String TITLE = "Financeiro";
 	
 	private TextField descricao = new TextField(DESCRICAO, VAZIO, 100, 0);
-	private MoneyField valor = new MoneyField(VALOR, VAZIO, 8, 0);
+	private TextField valor = new TextField(VALOR, VAZIO, 8, TextField.DECIMAL);
 	private DateField data = new DateField(DATA, DateField.DATE);//*/
+	private Display display;
 	public static final Command CMD_OK =  new Command(OK, Command.OK, 0);
 	public static final Command CMD_CANCEL = new Command(CANCEL, Command.CANCEL, 1);
 
-	public EditaLancamento(CommandListener listener) {
+	public EditaLancamento(CommandListener listener, Display display) {
 		super(TITLE);
+		this.display = display;
 		append(descricao);
 		append(valor);
 		append(data);
@@ -49,12 +52,13 @@ public class EditaLancamento extends Form{
 
 	public void setLancamento(String descricao, float valor, long data) {
 		this.descricao.setString(descricao);
-		this.valor.setString(valor);
+		this.valor.setString(Float.toString(valor));
 		this.data.setDate(new Date(data));
+		display.setCurrentItem(this.descricao);
 	}
 
 	public Lancamento getLancamento() {
-		return new Lancamento(descricao.getString(), valor.getValue(),
+		return new Lancamento(descricao.getString(), Float.parseFloat(valor.getString()),
 				data.getDate().getTime());
 	}
 
@@ -84,7 +88,7 @@ class MoneyField extends TextField implements FormatableField{
 	public void setString(float valor) {
 		String val = Float.toString(valor);
 		StringBuffer text = new StringBuffer(val);
-		text.setCharAt(val.indexOf('.'), ',');
+		//text.setCharAt(val.indexOf('.'), ',');
 		super.setString(text.toString());
 		//format();
 	}

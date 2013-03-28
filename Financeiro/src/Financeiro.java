@@ -1,3 +1,4 @@
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -23,23 +24,28 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 	private static final String EDITAR = "Editar";
 	private static final String EXCLUIR = "Exluir";
 	private static final String EXPORTAR = "Exportar";
-		
-	private static final int GRUPO = 2;
 	private static final String IMPORTAR = "Importar";
 	private static final String INSERIR = "Inserir";
-	private static final int LANCAMENTO = 1;
 	private static final String LANCAMENTOS = "Lançamentos";
+	private static final String PERIODOS = "Periodos";
 	private static final String MARCAR = "Marcar";
-	private static final int OPCAO = 0;
-	
 	private static final String PADRAO = "Padrão";
 	private static final String SAIR = "Sair";
 	private static final String SELECIONAR = "Selecionar";
-	private static final int VISAO = 3;
 	private static final String VISOES = "Visões";
 	static final String GRUPOS = "Grupos";
 	private static final String OPCOES = "Opções";
+	private static final String OK = "Ok";
 	
+	//Códigos de listas
+	private static final int OPCAO = 0;			//Lista de opções
+	private static final int LANCAMENTO = 1;	//Lista de lançamentos
+	private static final int GRUPO = 2;			//Lista de grupos
+	private static final int VISAO = 3;			//Lista de visões
+	
+	/*
+	 * Comandos disponíveis
+	 */
 	private Command cancelar = new Command(CANCELAR, Command.ITEM, 0);
 	private Command cmdEditar = new Command(EDITAR, Command.ITEM, 0);
 	private Command cmdExcluir = new Command(EXCLUIR, Command.ITEM, 0);
@@ -51,23 +57,38 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 	private Command cmdSair = new Command(SAIR, Command.EXIT, 0);
 	private Command cmdSelecionar =  new Command(SELECIONAR, Command.ITEM, 0);
 	private Command cmdVisoes = new Command(VISOES, Command.ITEM, 0);
-	private int currItem;
-	private Display display;
-	private EditaLancamento editaLancamento = new EditaLancamento(this);
-	private RichList grupo;
-	private Vector grupos = new Vector();
-	private Vector lancamentos = new Vector();
-	private RichList lista;
-	private Command marcar = new Command(MARCAR, Command.ITEM, 0);
-	private int modo = OPCAO;
-	private Vector opcoes = new Vector();
-	private Displayable telaAtual = lista;
-	private RichList telaGrupos;// = new Grupos(grupos);
-	private Vector view;
-	private Vector viewNames = new Vector();
-	private Hashtable views = new Hashtable();
-	private boolean inserindo;
+	private Command cmdMarcar = new Command(MARCAR, Command.ITEM, 0);
+	private Command cmdOk = new Command(OK, Command.ITEM, 0);
+	private Command cmdCancelar = new Command(CANCELAR, Command.ITEM, 0);
+
 	
+	private int currItem;							//Lançamento atual
+	private Display display;						//Componente display
+	private EditaLancamento editaLancamento;		//Tela de edição de lançamentos
+	private RichList grupo;							//Lista de lançamentos associados ao grupo atual
+	private Vector grupos = new Vector();			//Lista de grupos da visão atual
+	private Vector lancamentos = new Vector();		//Lista de lançamentos
+	private RichList lista;							//
+	private int modo = OPCAO;						//
+	private Vector opcoes = new Vector();			//
+	private Displayable telaAtual = lista;			//
+	private RichList telaGrupos;					// = new Grupos(grupos);
+	private Vector view;							//
+	private Vector viewNames = new Vector();		//Lista com nomes das visões
+	private Hashtable views = new Hashtable();		//Lista de visões com os respectivos grupos
+	private Hashtable gruposVisao;					//
+	private boolean inserindo;						//
+	private Hashtable viewTable = new Hashtable();	//
+	private RichLancamento rich;					//
+	private String grupoAtual;						//
+	private long data = System.currentTimeMillis();	//
+	private Hashtable descricoes;					//
+	private Vector listaPeriodos;					//
+	private boolean destroying = false;
+	
+	/**
+	 * 
+	 */
 	public Financeiro() {
 		load();
 		createView(PADRAO);
@@ -77,12 +98,15 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 		//lista.setItems(items);
 	}
 
+	/**
+	 * 
+	 */
 	private void load() {
 		new Thread(new Runnable() {
 			
 			public void run() {
 				try {
-					new Persist().load(LANCAMENTOS, lancamentos, new Lancamento());
+					carrega();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -90,21 +114,38 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 		}).start();
 	}
 
-	private String valor(float literal) {
-		StringBuffer valor = new StringBuffer(Float.toString(literal));
-		int len = valor.length();
-		int excesso = len-valor.toString().indexOf('.')-3;
-		if(excesso > 0)valor.setLength(len-excesso);
-		if(excesso < 0)valor.append('0');
-		return valor.toString();
+	/**
+	 * Carrega dados do sistema de registro do celular 
+	 * @throws RecordStoreFullException
+	 * @throws RecordStoreNotFoundException
+	 * @throws RecordStoreException
+	 **/
+	private void carrega() throws RecordStoreFullException, RecordStoreNotFoundException, RecordStoreException {
+		Persist persist = new Persist();
+		persist.load(LANCAMENTOS, lancamentos, new Lancamento());
+		viewNames = loadVector(VISOES, persist);
+		criaPeriodos();
+		listaPeriodos = loadVector(PERIODOS, persist);
+		System.out.println(listaPeriodos);
+	}
+	
+	/**
+	 * 
+	 **/
+	private void criaPeriodos() {
+		listaPeriodos = new Vector();
+//		addPeriodo(Util.mesAno(System.currentTimeMillis()));
+//		addPeriodo(Util.mesAno(System.currentTimeMillis()));
+		//listaPeriodos.addElement(Util.mesAno(System.currentTimeMillis()));
+		try {
+			storeVector(PERIODOS, listaPeriodos, new Persist());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void clickItem(RichList list, int index) {
-		/*
-		if(list == grupo){ 
-			((RichLancamento)list.getRichItem()).toggle((Lancamento) lancamentos.elementAt(index));
-			list.repaint();
-		}//*/
 		if(list instanceof RichList) commandAction(cmdSelecionar, list);
 	}
 
@@ -116,10 +157,12 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		else if(command == cmdMarcar)marcaItem();
 		else if(command == cmdExportar) exporta();
 		else if(command == cmdImportar) importa();
 		else if(command == cmdVisoes) listaVisoes();
 		else if(command == cmdOpcoes) listaOpcoes();
+		else if(command == cmdOk)novoGrupo(((EditaNome)tela).getNome());
 		
 		switch (modo) {
 		case OPCAO: opcoesCommand(command, tela);break;
@@ -131,6 +174,24 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 			editaLancamentoCommand(command, (EditaLancamento) tela);
 		lista.repaint();
 		
+	}
+
+	/**
+	 * Cria um novo grupo
+	 * @param nome o nome do grupo a ser criado
+	 */
+	private void novoGrupo(String nome) {
+		grupos.addElement(nome);
+		System.out.println("Financeiro.novoGrupo");
+		mostraTela(telaAtual);
+	}
+
+	/**
+	 * 
+	 */
+	private void marcaItem() {
+		rich.toggle((Lancamento) lancamentos.elementAt(grupo.getSelected()), grupoAtual);
+		mostraTela(telaAtual);
 	}
 
 	private void createView(String name) {
@@ -151,7 +212,9 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 	private void editaLancamentoCommand(Command command, EditaLancamento tela){
 		if(command == EditaLancamento.CMD_OK){
 			if(inserindo){
-				lancamentos.addElement(tela.getLancamento());
+				Lancamento lancamento = tela.getLancamento();
+				data = lancamento.getData();
+ 				lancamentos.addElement(lancamento);
 			}else lancamentos.setElementAt(tela.getLancamento(), currItem);
 			novoLancamento();
 		} else if(command == EditaLancamento.CMD_CANCEL) {
@@ -161,40 +224,78 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 		
 	}
 	
-	private String editaNome() {
-		return "Novo";
+	/**
+	 * Exibe tela de edição de nome
+	 * @param titulo título da tela
+	 * @return nome digitado pelo usuario
+	 */
+	private String editaNome(String titulo) {
+		return "Nome";
 	}
 
+	/**
+	 * Exclui um lançamento
+	 * @param index indíce do lançamento
+	 */
 	private void excluiLancamento(int index) {
 		lancamentos.removeElementAt(index);
 		lista.repaint();
 	}
 
+	/**
+	 * Exporta lançamentos para o arquivo
+	 */
 	private void exporta() {
 		new Persistencia().executa(lancamentos, Persistencia.EXPORTAR, LANCAMENTOS, new Lancamento(), lista);
 	}
 	
+	/**
+	 * Executa comandos associados à lista de grupos
+	 * @param command comando a ser executado
+	 * @param tela tela atual
+	 */
 	private void gruposCommand(Command command, Displayable tela) {		
 		if(command == cmdSelecionar){
-			grupo = new RichList(this, lancamentos, new RichLancamento(new Hashtable()));
-			grupo.addCommand(marcar);
+			rich = new RichLancamento(viewTable );
+			grupo = new RichList(this, lancamentos, rich);
+			grupo.addCommand(cmdMarcar);
 			grupo.addCommand(cancelar);
-			grupo.setTitle(grupos.elementAt(0).toString());
+			grupoAtual = grupos.elementAt(telaGrupos.getSelected()).toString();
+			grupo.setTitle(grupoAtual);
 			mostraTela(grupo);
 		} else if(command == cancelar){
 			mostraTela(lista);
 		} else if (command ==  cmdExcluir){
 			grupos.removeElementAt(telaGrupos.getSelected());
 		} else if (command ==  cmdInserir){
-			grupos.addElement(editaGrupo(new Grupo(editaNome(), new Vector())));
+			insereGrupo();
 		}
 	}
 
+	/**
+	 * Importa lançamentos do arquivo
+	 */
 	private void importa() {
 		new Persistencia().executa(lancamentos, Persistencia.IMPORTAR, LANCAMENTOS, new Lancamento(), lista);
 		lista.setItems(lancamentos);
 	}
 
+	/**
+	 * Insere um grupo na visão
+	 */
+	private void insereGrupo() {
+		EditaNome edita = new EditaNome();
+		edita.addCommand(cmdOk);
+		edita.addCommand(cmdCancelar);
+		edita.setCommandListener(this);
+		display.setCurrent(edita);
+	}
+
+	/**
+	 * Executa comandos associados à lista de lançamentos 
+	 * @param command comando que será executado
+	 * @param tela tela atual
+	 */
 	private void lancamentosCommand(Command command, Displayable tela) {
 		if(command == cmdInserir) novoLancamento();
 		else if(command == cmdEditar) editaLancamento(lista.getSelected());
@@ -202,6 +303,9 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 		
 	}
 
+	/**
+	 * Lista os grupos dentro ou fora de uma visão
+	 */
 	private void listaGrupos() {
 		modo = GRUPO;
 		//if(view == null) view = new Vector();
@@ -212,6 +316,9 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 		mostraTela(telaGrupos);		
 	}
 	
+	/**
+	 *Lista os lançamentos de um período dentro ou fora de um grupo.
+	 */
 	private void listaLancamentos() {
 		modo = LANCAMENTO;
 		lista = new RichList(this, lancamentos, new RichLancamento());
@@ -224,6 +331,9 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 		mostraTela(lista);
 	}
 
+	/**
+	 * Lista as opções disponíveis
+	 */
 	private void listaOpcoes() {
 		modo = OPCAO;
 		lista =  new RichList(this, opcoes, new RichStringItem());
@@ -232,36 +342,52 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 		mostraTela(lista);
 	}
 
+	/**
+	 * Lista as visões disponíveis
+	 */
 	private void listaVisoes() {
 		view = null;
 		modo = VISAO;
 		lista =  new RichList(this, viewNames, new RichStringItem());
 		lista.addCommand(cmdInserir);
 		lista.addCommand(cmdExcluir);
-		lista.addCommand(cmdGrupos);
+		lista.addCommand(cmdSelecionar);
 		lista.addCommand(cmdOpcoes);
 		mostraTela(lista);
 	}
 	
+	/**
+	 * Mostra a tela
+	 * @param tela tela a ser mostrada
+	 */
 	private void mostraTela(Displayable tela) {
 		if(tela != null) telaAtual = tela;
 		if(telaAtual == null | display == null) return;
 		display.setCurrent(telaAtual);
+		System.out.println(telaAtual);
 		telaAtual.setCommandListener(this);
 		if(telaAtual instanceof Canvas)((Canvas)telaAtual).repaint();
 	}
 	
+	/**
+	 * Insere um novo lançamento
+	 */
 	private void novoLancamento(){
 		inserindo = true;
-		Lancamento lancamento = new Lancamento();
+		Lancamento lancamento = new Lancamento("", 0, data );
 		editaLancamento.setLancamento(lancamento);/*
 		mostraTela(editaLancamento);
 		lancamentos.addElement(lancamento);
-		currItem = lancamentos.size()-1;//*/
-		editaLancamento.setLancamento(lancamento);
+		currItem = lancamentos.size()-1;
+		editaLancamento.setLancamento(lancamento);//*/
 		mostraTela(editaLancamento);
 	}
 
+	/**
+	 * Executa comandos associados à lista de opções
+	 * @param command comando que será executado
+	 * @param tela rela atual
+	 */
 	private void opcoesCommand(Command command, Displayable tela) {
 		
 		if(command == cmdSelecionar){
@@ -273,16 +399,25 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 		}
 	}
 
+	/**
+	 * Remove uma visão da lista de visões
+	 * @param selected visão que deve ser removida
+	 */
 	private void removeView(int selected) {
 		String viewName = (String) viewNames.elementAt(selected);
 		viewNames.removeElementAt(selected);
 		views.remove(viewName);
 	}
 
+	/**
+	 * Executa comandos associados à lista de visões
+	 * @param command comando a ser executado
+	 * @param tela tela atual
+	 */
 	private void viewsCommand(Command command, Displayable tela) {
 		if(command == cmdInserir){
-			createView(editaNome());
-		} else if(command == cmdGrupos){
+			createView(editaNome(VISOES));
+		} else if(command == cmdSelecionar){
 			view =  (Vector) views.get(lista.getItem((lista.getSelected())));
 			listaGrupos();
 		} else if(command == cmdExcluir){
@@ -290,30 +425,120 @@ public class Financeiro extends MIDlet implements CommandListener, ListListener{
 		}
 	}
 
+	/**
+	 * 
+	 */
 	protected void destroyApp(boolean unconditional) throws MIDletStateChangeException {
+		if(destroying)return;
+		destroying = true;
 		new Thread(new Runnable() {
 			
 			public void run() {
 				try {
-					Persist persist = new Persist();
-					persist.store(LANCAMENTOS, lancamentos);
-					persist.store(VISOES, viewNames);
-					persist.store(GRUPOS, grupos);
-					notifyDestroyed();
+					armazena();
 				} catch (Exception e) {
 					e.printStackTrace();
+				}finally{
+					notifyDestroyed();
 				}
 			}
+
 		}).start();
 	}
 
+	/**
+	 * Eexecuta rotina de armazenamento.
+	 * @throws RecordStoreFullException
+	 * @throws RecordStoreNotFoundException
+	 * @throws RecordStoreException
+	 */
+	private void armazena() throws RecordStoreFullException, RecordStoreNotFoundException, RecordStoreException {
+			Persist persist = new Persist();
+			persist.store(LANCAMENTOS, lancamentos);
+			storeHash(persist, gruposVisao, VISOES);
+			storeHash(persist, descricoes, GRUPOS);
+			persist.store(GRUPOS, grupos);
+			storeVector(PERIODOS, listaPeriodos, persist);
+	}
+	
+	/**
+	 * Armazena um Hashtable na camada de persistêcia
+	 * @param persist instância da classe Persist
+	 * @param hash instância da classe Hashtable a ser armazenada
+	 * @param section nome da seção onde será armazenado o Hashtable
+	 * @throws RecordStoreFullException
+	 * @throws RecordStoreNotFoundException
+	 * @throws RecordStoreException
+	 */
+	private void storeHash(Persist persist, Hashtable hash, String section) throws RecordStoreFullException, RecordStoreNotFoundException, RecordStoreException{
+			if(hash == null)return;
+			Enumeration keys = hash.keys();
+			while (keys.hasMoreElements()) {
+				String visao = (String) keys.nextElement();
+				persist.writeRecord(section, visao);
+				Vector vector = (Vector) hash.get(visao);
+				StringBuffer sb = new StringBuffer();
+				for(int i = 0; i < vector.size(); i++){
+					sb.append(vector.elementAt(i));
+					sb.append(';');
+				}
+				persist.writeRecord(section, sb.toString());
+			}
+	}
+	
 	protected void pauseApp() {	}
 
+	/**
+	 * 
+	 */
 	protected void startApp() throws MIDletStateChangeException {
 		if(Fluxo.getMIDlet() == null)Fluxo.setMIDlet(this);
 		if(display == null) display = Display.getDisplay(this);
+		editaLancamento = new EditaLancamento(this, display);
 		if(telaAtual == null)listaOpcoes();
 		else mostraTela(null);
 	}
-
+	
+	/**
+	 * Armazena um vetor na camada de persistência (Classe Persist)
+	 * @param section nome da seção
+	 * @param vector vetor que será armazenado
+	 * @param persist instância da classe Persist
+	 * @throws RecordStoreFullException
+	 * @throws RecordStoreNotFoundException
+	 * @throws RecordStoreException
+	 */
+	private void storeVector( String section, Vector vector,Persist persist) throws RecordStoreFullException, RecordStoreNotFoundException, RecordStoreException{
+		for(int i = 0; i < vector.size(); i++){
+			//System.out.println("Storing "+vector.elementAt(i));
+			persist.writeRecord(section, vector.elementAt(i).toString());
+		}		
+	}
+	
+	/**
+	 * Carrega um vetor através da camada de persistência (Classe Persist)
+	 * @param section nome da seção
+	 * @param persist instância da classe Persist
+	 * @return
+	 * @throws RecordStoreFullException
+	 * @throws RecordStoreNotFoundException
+	 * @throws RecordStoreException
+	 */
+	private Vector loadVector(String section, Persist persist) throws RecordStoreFullException, RecordStoreNotFoundException, RecordStoreException{
+		int numRec = persist.numRecords(section);
+		Vector vector = new Vector();
+//		System.out.println(numRec);
+		if(numRec > 0)
+			for(int i = 1; i <= numRec; i += 2) vector.addElement(persist.readRecord(i, section));
+//		System.out.println("Vector: "+vector.size());
+		return vector;		
+	}
+	
+	/**
+	 * Adiciona o mês à lista de períodos, sem duplicidade
+	 * @param periodo
+	 */
+	private void addPeriodo(String periodo){
+		if(!listaPeriodos.contains(periodo))listaPeriodos.addElement(periodo);
+	}
 }

@@ -32,7 +32,8 @@ public class Teste extends MIDlet
 * */
 
   public Teste() throws IOException {
-	 
+	  InputStream s = getClass().getResourceAsStream("META-INF/MANIFEST.MF");
+
 	//platformRequest("https://docs.google.com");
 
 /*  	exitCommand = new Command("Exit", Command.EXIT, 1);
