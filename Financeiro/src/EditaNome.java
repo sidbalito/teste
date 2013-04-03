@@ -7,7 +7,7 @@ public class EditaNome extends Form{
 	private TextField nome = new TextField("Nome", "", 100, 0);
 	public EditaNome() {
 		super("");
-		append(nome );
+		append(nome);
 	}
 	
 	public String getNome(){

@@ -1,5 +1,4 @@
 package comum;
-import java.util.Hashtable;
 import java.util.Vector;
 
 /**
@@ -22,7 +21,7 @@ public class StringsVector {
 			if(pos<0)pos = string.indexOf(CLOSE, i);
 			if(pos<0 & i < len)pos = len;
 			if(pos<0)break;
-			vector.addElement(string.substring(i, pos));
+			vector.addElement(string.substring(i, pos).trim());
 			i = pos+1;
 		}
 	}

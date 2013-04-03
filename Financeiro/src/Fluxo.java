@@ -6,7 +6,7 @@ public class Fluxo {
 	public static final int RESULT_CANCEL = 1;
 	static MIDlet midlet;
 	public static void setResult(int resultOk) {
-		System.out.println("resumindo...");
+		//System.out.println("resumindo...");
 		midlet.resumeRequest();
 	}
 	

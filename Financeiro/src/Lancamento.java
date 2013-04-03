@@ -16,6 +16,36 @@ public class Lancamento implements Serializable {
 		this.setData(data);
 	}
 	
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (data ^ (data >>> 32));
+		result = prime * result
+				+ ((descricao == null) ? 0 : descricao.hashCode());
+		result = prime * result + Float.floatToIntBits(valor);
+		return result;
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Lancamento other = (Lancamento) obj;
+		if (data != other.data)
+			return false;
+		if (descricao == null) {
+			if (other.descricao != null)
+				return false;
+		} else if (!descricao.equals(other.descricao))
+			return false;
+		if (Float.floatToIntBits(valor) != Float.floatToIntBits(other.valor))
+			return false;
+		return true;
+	}
+
 	public Lancamento() {
 		this("", 0, System.currentTimeMillis());
 	}

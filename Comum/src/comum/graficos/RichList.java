@@ -132,18 +132,19 @@ public class RichList extends Canvas implements Drawable, Commandable{
 	}
 
 	protected void keyPressed(int keyCode) {
+		System.out.println("KeyCode: "+keyCode);
 		int index = getSelected();
 		switch(keyCode){
 		case KeyBoard.UP_KEY: if(index > 0) setSelected(index-1); repaint(); break;
 		case KeyBoard.DOWN_KEY: if(index < size()-1) setSelected(index+1); repaint(); break;
 		case KeyBoard.FIRE_KEY: {
 			if(listaListener != null)listaListener.clickItem(this, index);
-		}
+		}break;
 		}
 	}
 	
 	protected void keyRepeated(int keyCode) {
-		keyPressed(keyCode);
+		//keyPressed(keyCode);
 	}
 	
 	public int getSelected() {
@@ -189,7 +190,7 @@ public class RichList extends Canvas implements Drawable, Commandable{
 	}
 	
 	private int drawItem(Graphics g, int i, int x, int y, boolean before){
-		System.out.println("Indíce:"+i);
+		//System.out.println("Indíce:"+i);
 		Graphics itemGraphics = img.getGraphics();
 		itemGraphics.setColor(0xFFFFFF);
 		itemGraphics.fillRect(0, 0, graphicsWidth, graphicsHeight);
@@ -202,6 +203,10 @@ public class RichList extends Canvas implements Drawable, Commandable{
 	
 	public RichItem getRichItem(){
 		return richListItem;
+	}
+
+	public void removeItem(int selected) {
+		items.removeElementAt(selected);
 	}
 }
 
